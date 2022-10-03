@@ -21,7 +21,7 @@ namespace FacilityManagement.Controllers.AuthenticationController
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             var response = await userService.LoginUser(request); 
             var token = response.Token;

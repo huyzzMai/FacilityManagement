@@ -41,6 +41,8 @@ namespace FacilityManagement
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserRepository, UserRepository>();
 
+            services.AddCors();
+
             services.AddControllersWithViews()
                 .AddNewtonsoftJson()
                 .AddXmlDataContractSerializerFormatters();
@@ -120,7 +122,7 @@ namespace FacilityManagement
                 .AllowAnyMethod()
                     .AllowAnyHeader()
                     .SetIsOriginAllowed(origin => true)
-                    .WithOrigins("http://localhost:3000")
+                    .WithOrigins("http://localhost:5000")
                     .AllowCredentials();
             });
         }

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace FacilityManagement.Controllers
 {
+    [Route("api/weather")]
     [ApiController]
-    [Route("[controller]")]
-    ////[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -26,6 +26,7 @@ namespace FacilityManagement.Controllers
         }
 
         [HttpGet]
+        //[Authorize(Roles = "Admin")]
         public IEnumerable<WeatherForecast> Get()
         {
             var rng = new Random();

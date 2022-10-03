@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
+using BusinessObject.Commons;
 
 namespace DataAccess.Services
 {
@@ -33,7 +34,7 @@ namespace DataAccess.Services
             
                 String userId = user.Id.ToString();
 
-                if (user.Role == 1)
+                if (user.Role == CommonEnums.ROLE.ADMIN)
                 {
                     var claims = new[]
                     {
@@ -60,7 +61,7 @@ namespace DataAccess.Services
                 {
                     var claims = new[]
                     {
-                    new Claim(ClaimTypes.Role, "Admin"),
+                    new Claim(ClaimTypes.Role, "Student"),
                     new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
