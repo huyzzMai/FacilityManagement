@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using BusinessObject.Commons;
+using BusinessObject.ResponseModel.UserResponse;
+using BusinessObject.RequestModel.UserReqest;
 
 namespace DataAccess.Services
 {
@@ -80,6 +82,83 @@ namespace DataAccess.Services
                     };
                     return result;
                 }
+        }
+
+        public async Task<IEnumerable<UserResponse>> GetAllUsers()
+        {
+            var users = await userRepository.GetAllUsers();
+            IEnumerable<UserResponse> result = users.Select(
+                user =>
+                {
+                    // Cast role from int to string for response
+                    string role;
+                    if (user.Role == CommonEnums.ROLE.ADMIN)
+                    {
+                        role = "Admin";
+                    }
+                    else
+                    {
+                        role = "Student";
+                    }
+
+                    return new UserResponse()
+                    {
+                        FullName = user.FullName,
+                        Email = user.Email,
+                        Image = user.Image,
+                        Role = role,
+                        Status = user.Status
+                    };
+                }
+                )
+                .ToList();
+            return result;  
+        }
+
+        public async Task<User> GetUserById(int id)
+        {
+            User u = await userRepository.GetUserAndDeleteIsFalse(id);
+            return u;
+        }
+
+        public async Task<UserResponse> UpdateUser(int id, UserRequest model)
+        {
+            var u = await userRepository.GetUserAndDeleteIsFalse(id);
+
+            if(u == null)
+            {
+                throw new Exception("This user cannot be updated!");
+            }
+
+            u.FullName = model.FullName;
+            u.Email = model.Email;
+            u.Image = model.Image;
+
+            await userRepository.SaveUser(u);
+
+            var upuser = new UserResponse()
+            {
+                FullName = u.FullName,
+                Email = u.Email,
+                Image = u.Image
+
+            };
+
+            return upuser;
+        }
+
+        public async Task DeleteUser(int id)
+        {
+            User u = await userRepository.GetUserAndDeleteIsFalse(id);
+
+            if(u == null)
+            {
+                throw new Exception("This user is unavailable to delete.");
+            }
+            
+            u.IsDeleted = true;
+
+           await userRepository.SaveUser(u);
         }
 
     }

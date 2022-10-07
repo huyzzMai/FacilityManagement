@@ -6,6 +6,7 @@ using DataAccess.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -52,6 +53,12 @@ namespace FacilityManagement
             x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                //.AddGoogle(opts =>
+                //{
+                //    opts.ClientId = Configuration["ClientId"];
+                //    opts.ClientSecret = Configuration["ClientSecret"];
+                //    opts.SignInScheme = IdentityConstants.ExternalScheme;
+                //})
                 .AddJwtBearer(options =>
                 {
                     options.RequireHttpsMetadata = false;
