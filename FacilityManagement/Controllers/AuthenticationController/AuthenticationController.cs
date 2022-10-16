@@ -36,5 +36,13 @@ namespace FacilityManagement.Controllers.AuthenticationController
             }
         }
 
+        [Route("api/authen/google-login")]
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleLogin()
+        {
+            return null;
+        }
+
     }
 }
