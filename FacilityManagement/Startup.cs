@@ -40,6 +40,8 @@ namespace FacilityManagement
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRoomService, RoomService>();
+            services.AddScoped<IRoomRepository, RoomRepository>();
 
             services.AddCors();
 
