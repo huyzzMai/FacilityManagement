@@ -14,5 +14,6 @@ namespace DataAccess.IRepositories
         // Get active user
         Task<User> GetUserAndDeleteIsFalse(int id);
         Task SaveUser(User user);
+        Task SaveCreateUser(User user); 
     }
 }
