@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BusinessObject.Models;
 using DataAccess.IRepositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories
 {
@@ -14,18 +16,18 @@ namespace DataAccess.Repositories
             _facilityFeedbackManagementContext = facilityFeedbackManagementContext;
         }
 
-        public void Create(Feedback feedback)
+        public async Task Create(Feedback feedback)
         {
             Feedback _feedback = null;
             try
             {
-                _feedback = GetFeedback(feedback.Id);
+                _feedback = await GetFeedback(feedback.Id);
                 if (_feedback != null)
                 {
                     throw new Exception("Create fail: " + "Id existed");
                 }
-                _facilityFeedbackManagementContext.Feedbacks.Add(feedback);
-                _facilityFeedbackManagementContext.SaveChanges();
+                await _facilityFeedbackManagementContext.Feedbacks.AddAsync(feedback);
+                await _facilityFeedbackManagementContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -33,18 +35,18 @@ namespace DataAccess.Repositories
             }
         }
 
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
             Feedback feedback = null;
             try
             {
-                feedback = GetFeedback(id);
+                feedback = await GetFeedback(id);
                 if (feedback == null)
                 {
                     throw new Exception("Delete fail: " + "Id not found");
                 }
                 _facilityFeedbackManagementContext.Feedbacks.Remove(feedback);
-                _facilityFeedbackManagementContext.SaveChanges();
+                await _facilityFeedbackManagementContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -52,12 +54,12 @@ namespace DataAccess.Repositories
             }
         }
 
-        public Feedback GetFeedback(int id)
+        public async Task<Feedback> GetFeedback(int id)
         {
             Feedback feedback = null;
             try
             {
-                feedback = _facilityFeedbackManagementContext.Feedbacks.Find(id);
+                feedback = await _facilityFeedbackManagementContext.Feedbacks.FindAsync(id);
             }
             catch (Exception ex)
             {
@@ -67,12 +69,12 @@ namespace DataAccess.Repositories
             return feedback;
         }
 
-        public IEnumerable<Feedback> GetList()
+        public async Task<IEnumerable<Feedback>> GetList()
         {
             IEnumerable<Feedback> feedbacks = null;
             try
             {
-                feedbacks = _facilityFeedbackManagementContext.Feedbacks.AsQueryable();
+                feedbacks = await _facilityFeedbackManagementContext.Feedbacks.ToListAsync();
             }
             catch (Exception ex)
             {
@@ -82,12 +84,12 @@ namespace DataAccess.Repositories
             return feedbacks;
         }
 
-        public void Update(Feedback _feedback)
+        public async Task Update(Feedback _feedback)
         {
             Feedback feedback = null;
             try
             {
-                feedback = GetFeedback(_feedback.Id);
+                feedback = await GetFeedback(_feedback.Id);
                 if (feedback == null)
                 {
                     throw new Exception("Update fail: " + "Id not found");

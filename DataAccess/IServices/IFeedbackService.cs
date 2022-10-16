@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using BusinessObject.Models;
+
 namespace DataAccess.IServices
 {
-    public class IFeedbackService
+    public interface IFeedbackService
     {
-        public IFeedbackService()
-        {
-        }
+        Task CreateFeedback(Feedback feedback);
+        Task<IEnumerable<Feedback>> GetAllFeedback();
+        Task<Feedback> GetFeedbackById(int id);
     }
 }
 

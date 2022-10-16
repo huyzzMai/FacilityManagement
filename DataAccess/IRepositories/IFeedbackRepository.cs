@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BusinessObject.Models;
 
 namespace DataAccess.IRepositories
 {
     public interface IFeedbackRepository
     {
-        public void Create(Feedback feedback);
-        public Feedback GetFeedback(int id);
-        public IEnumerable<Feedback> GetList();
-        public void Update(Feedback feedback);
-        public void Delete(int id);
+        public Task Create(Feedback feedback);
+        public Task<Feedback> GetFeedback(int id);
+        public Task<IEnumerable<Feedback>> GetList();
+        public Task Update(Feedback feedback);
+        public Task Delete(int id);
     }
 }
 
