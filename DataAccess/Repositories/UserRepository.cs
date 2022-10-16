@@ -37,10 +37,17 @@ namespace DataAccess.Repositories
             return user;    
         }
 
-        // User when delete or update user
+        // Use when delete or update user
         public async Task SaveUser(User user)
         {
             dbContext.Users.Update(user);
+            await dbContext.SaveChangesAsync();
+        }
+        
+        // Save user for creation
+        public async Task SaveCreateUser(User user)
+        {
+            dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
         }
     }
