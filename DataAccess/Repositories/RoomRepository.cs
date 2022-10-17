@@ -44,9 +44,9 @@ namespace DataAccess.Repositories
                 throw new Exception(ex.Message);
             }
         }
-        public async Task DeleteRoom(Room room)
+        public async Task UpdateRoom(Room room)
         {
-            dbContext.Rooms.Remove(room);
+            dbContext.Rooms.Update(room);
             await dbContext.SaveChangesAsync();
         }
     }

@@ -32,39 +32,39 @@ namespace FacilityManagement.Controllers.RoomController
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
             }
         }
-        //[HttpPost]
-        //public async Task<IActionResult> Create(string name, [FromBody] RoomRequest rooms)
-        //{
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] RoomRequest rooms)
+        {
 
-        //    try
-        //    {
-        //        Room r = await roomService.GetRoomByName(name);
+            try
+            {
+                var r = await roomService.GetRoomByName(rooms.Name);
 
-        //        if (r == null)
-        //        {
-        //            await roomService.CreateRoom(name, rooms);
-        //            return Ok();
-        //        }
-        //        else
-        //        {
-        //            return StatusCode(StatusCodes.Status500InternalServerError,
-        //            "Room Existed! ");
+                if (r == null)
+                {
+                    await roomService.CreateRoom(rooms);
+                    return Ok();
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Room Existed! ");
 
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError,
-        //             "Error creating user!");
-        //    }
-        //}
+                }
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                     "Error creating user!");
+            }
+        }
 
-        [HttpPut("{name:alpha}")]
-        public async Task<IActionResult> UpdateRoom(string name, [FromBody] RoomRequest rooms)
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateRoom(int id,[FromBody] RoomRequest rooms)
         {
             try
             {
-                var u = await roomService.GetRoomByName(name);
+                var u = await roomService.GetRoomById(id);
 
                 if (u == null)
                 {
@@ -73,22 +73,23 @@ namespace FacilityManagement.Controllers.RoomController
                 }
                 else
                 {
-                    return Ok(await roomService.UpdateRoom(name, rooms));
+                    return Ok(await roomService.UpdateRoom(id, rooms));
+
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting user!");
+                    ex.Message);
             }
         }
 
-        [HttpDelete("{name:alpha}")]
-        public async Task<IActionResult> DeleteRoom(string name)
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteRoom(int id)
         {
             try
             {
-                var r = await roomService.GetRoomByName(name);
+                var r = await roomService.GetRoomById(id);
 
                 if (r == null)
                 {
@@ -97,7 +98,7 @@ namespace FacilityManagement.Controllers.RoomController
                 }
                 else
                 {
-                    await roomService.DeleteRoom(name);
+                    await roomService.DeleteRoom(id);
                     return Ok();
                 }
             }
@@ -105,21 +106,6 @@ namespace FacilityManagement.Controllers.RoomController
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                      "Error deleting user!");
-            }
-        }
-        [HttpPost]
-        public async Task<IActionResult> TestCreateRoom([FromBody] RoomRequest room)
-        {
-            try
-            {
-               
-                    await roomService.CreateRoom("1", room);
-                    return Ok();
-                
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,ex.Message);
             }
         }
 
