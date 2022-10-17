@@ -63,35 +63,40 @@ namespace DataAccess.Services
                 .ToList();
             return result;
         }
-        public async Task<RoomResponse> UpdateRoom(string name, RoomRequest rooms)
+        public async Task<RoomResponse> UpdateRoom(int id, RoomRequest rooms)
         {
-            var r = await roomRepository.GetRoomByName(name);
+            var r = await roomRepository.GetRoomAndDeleteIsFalse(id);
+            var u = await roomRepository.GetRoomByName(rooms.Name);
 
             if (r == null)
             {
-                throw new Exception("This room cannot be updated!");
+                throw new Exception("This room cannot be updated because there is no room with that id!");
             }
-
-            Room rms = new Room();
-
-            rms.Name = rooms.Name;
-            rms.Level = rooms.Level;
-            rms.Status = rooms.Status;
-
-            await roomRepository.SaveRoom(rms);
-
-            var uproom = new RoomResponse()
+            if (u == null)
             {
-                Name = rms.Name,
-                Level = rms.Level,
-            };
+                r.Name = rooms.Name;
+                r.Level = rooms.Level;
+                r.Status = rooms.Status;
 
-            return uproom;
+                await roomRepository.UpdateRoom(r);
+
+                var uproom = new RoomResponse()
+                {
+                    Name = r.Name,
+                    Level = r.Level,
+                };
+
+                return uproom;
+            }
+            else
+            {
+                throw new Exception("Room already existed!");
+            }
         }
 
-        public async Task<RoomResponse> CreateRoom(string name,RoomRequest rooms)
+        public async Task<RoomResponse> CreateRoom(RoomRequest rooms)
         {
-            var r = await roomRepository.GetRoomByName(name);
+            var r = await roomRepository.GetRoomByName(rooms.Name);
             
             if (r == null)
             {
@@ -99,6 +104,7 @@ namespace DataAccess.Services
                 rms.Name = rooms.Name;
                 rms.Level = rooms.Level;
                 rms.Status = rooms.Status;
+                rms.IsDeleted = false;
                 await roomRepository.SaveRoom(rms);
 
                 var uproom = new RoomResponse()
@@ -115,9 +121,9 @@ namespace DataAccess.Services
             }
 
         }
-        public async Task DeleteRoom(string name)
+        public async Task DeleteRoom(int id)
         {
-            Room r = await roomRepository.GetRoomByName(name);
+            Room r = await roomRepository.GetRoomAndDeleteIsFalse(id);
 
             if (r == null)
             {
@@ -126,7 +132,7 @@ namespace DataAccess.Services
 
             r.IsDeleted = true;
 
-            await roomRepository.DeleteRoom(r);
+            await roomRepository.UpdateRoom(r);
         }
     }
 }
