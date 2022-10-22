@@ -13,7 +13,10 @@ namespace DataAccess.IRepositories
         Task<List<User>> GetAllUsers();
         // Get active user
         Task<User> GetUserAndDeleteIsFalse(int id);
+        Task<User> GetUerByEmailAndDeleteIsFalse(string email);
+        // Use when delete or update user
         Task SaveUser(User user);
+        // Save user for creation
         Task SaveCreateUser(User user); 
     }
 }

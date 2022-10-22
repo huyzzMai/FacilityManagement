@@ -12,7 +12,7 @@ namespace BusinessObject.ResponseModel.UserResponse
         public string Email { get; set; }
         public string Image { get; set; }
         public string Role { get; set; }
-        public int? Status { get; set; }
+        public string Status { get; set; }
         
     }
 }

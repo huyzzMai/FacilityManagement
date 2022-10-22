@@ -24,10 +24,10 @@ namespace FacilityManagement.Controllers.UserController
             {
                 return Ok(await userService.GetAllUsers());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
+                    ex.Message);
             }
         }
 
@@ -48,10 +48,10 @@ namespace FacilityManagement.Controllers.UserController
                     return Ok(await userService.UpdateUser(id, model));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting user!");
+                    ex.Message);
             }
         }
 
@@ -73,10 +73,10 @@ namespace FacilityManagement.Controllers.UserController
                     return Ok();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting user!");
+                    ex.Message);
             }
         }
     }

@@ -63,7 +63,7 @@ namespace DataAccess.Services
                 {
                     var claims = new[]
                     {
-                    new Claim(ClaimTypes.Role, "Student"),
+                    new Claim(ClaimTypes.Role, "User"),
                     new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
@@ -84,6 +84,32 @@ namespace DataAccess.Services
                 }
         }
 
+        public async Task<LoginResponse> LoginUserForGoogle(User user)
+        {
+            String userId = user.Id.ToString();
+
+            var claims = new[]
+                    {
+                    new Claim(ClaimTypes.Role, "User"),
+                    new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    new Claim("Id", userId)
+                    };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+
+            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], claims, expires: DateTime.UtcNow.AddDays(1), signingCredentials: signIn);
+
+            var result = new LoginResponse()
+            {
+                Token = token
+            };
+            return result;
+        }
+
         public async Task<IEnumerable<UserResponse>> GetAllUsers()
         {
             var users = await userRepository.GetAllUsers();
@@ -91,7 +117,7 @@ namespace DataAccess.Services
                 user =>
                 {
                     // Cast role from int to string for response
-                    string role;
+                    string role, status;
                     if (user.Role == CommonEnums.ROLE.ADMIN)
                     {
                         role = "Admin";
@@ -100,6 +126,14 @@ namespace DataAccess.Services
                     {
                         role = "Student";
                     }
+                    if (user.Status == CommonEnums.USERSTATUS.ACTIVE)
+                    {
+                        status = "Active";
+                    }
+                    else
+                    {
+                        status = "Inactive";
+                    }
 
                     return new UserResponse()
                     {
@@ -107,7 +141,7 @@ namespace DataAccess.Services
                         Email = user.Email,
                         Image = user.Image,
                         Role = role,
-                        Status = user.Status
+                        Status = status
                     };
                 }
                 )
@@ -118,6 +152,29 @@ namespace DataAccess.Services
         public async Task<User> GetUserById(int id)
         {
             User u = await userRepository.GetUserAndDeleteIsFalse(id);
+            return u;
+        }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            User u = await userRepository.GetUerByEmailAndDeleteIsFalse(email);
+            return u;
+        }
+
+        public async Task<User> CreateUserByGoogleLogin(GoogleUserCreateRequest request)
+        {
+            User u = new User()
+            {
+                FullName = request.FullName,
+                Email = request.Email,
+                Image = request.Img,
+                Role = CommonEnums.ROLE.USER,
+                IsDeleted = false,
+                CreatedAt = DateTime.Now
+            };
+
+            await userRepository.SaveCreateUser(u);
+
             return u;
         }
 
@@ -133,6 +190,7 @@ namespace DataAccess.Services
             u.FullName = model.FullName;
             u.Email = model.Email;
             u.Image = model.Image;
+            u.UpdatedAt = DateTime.Now;
 
             await userRepository.SaveUser(u);
 
@@ -157,8 +215,10 @@ namespace DataAccess.Services
             }
             
             u.IsDeleted = true;
+            u.Status = CommonEnums.USERSTATUS.INACTIVE;
+            u.UpdatedAt = DateTime.Now;
 
-           await userRepository.SaveUser(u);
+            await userRepository.SaveUser(u);
         }
 
     }

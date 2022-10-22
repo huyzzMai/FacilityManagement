@@ -37,14 +37,18 @@ namespace DataAccess.Repositories
             return user;    
         }
 
-        // Use when delete or update user
+        public async Task<User> GetUerByEmailAndDeleteIsFalse(string email)
+        {
+            User user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.IsDeleted == false);
+            return user;
+        }
+
         public async Task SaveUser(User user)
         {
             dbContext.Users.Update(user);
             await dbContext.SaveChangesAsync();
         }
-        
-        // Save user for creation
+            
         public async Task SaveCreateUser(User user)
         {
             dbContext.Users.Add(user);
