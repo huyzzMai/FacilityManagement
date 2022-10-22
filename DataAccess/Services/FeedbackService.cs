@@ -27,6 +27,7 @@ namespace DataAccess.Services
 
                 feedback.RoomId = feedbackRequest.roomId;
                 feedback.UserId = feedbackRequest.userId;
+                feedback.Description = feedbackRequest.description;
 
                 await _feedbackRepository.Update(feedback);
             }
@@ -59,9 +60,9 @@ namespace DataAccess.Services
             try
             {
                 IEnumerable<Feedback> feedbacks = await _feedbackRepository.GetList();
-                IEnumerable <FeedbackResponse> feedbackRequests = feedbacks
+                IEnumerable <FeedbackResponse> FeedbackResponses = feedbacks
                     .Select(f => new FeedbackResponse() { id = f.Id, userName = f.User.FullName, roomName = f.Room.Name, deviceName = f.Device.Name, description = f.Description, status = f.Status.ToString() });
-                return feedbackRequests;
+                return FeedbackResponses;
             }
             catch (Exception ex)
             {
