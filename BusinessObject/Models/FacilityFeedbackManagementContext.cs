@@ -147,9 +147,7 @@ namespace BusinessObject.Models
                     .IsRequired()
                     .HasMaxLength(200);
 
-                entity.Property(e => e.DeviceTypeId).HasColumnName("DeviceTypeID");
-
-                entity.Property(e => e.ResponseId).HasColumnName("ResponseID");
+                entity.Property(e => e.DeviceId).HasColumnName("DeviceID");
 
                 entity.Property(e => e.RoomId).HasColumnName("RoomID");
 
@@ -161,11 +159,11 @@ namespace BusinessObject.Models
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
-                entity.HasOne(d => d.DeviceType)
+                entity.HasOne(d => d.Device)
                     .WithMany(p => p.Feedbacks)
-                    .HasForeignKey(d => d.DeviceTypeId)
+                    .HasForeignKey(d => d.DeviceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Feedback_DeviceType");
+                    .HasConstraintName("FK_Feedback_Device");
 
                 entity.HasOne(d => d.Room)
                     .WithMany(p => p.Feedbacks)

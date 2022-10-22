@@ -20,5 +20,6 @@ namespace BusinessObject.Models
 
         public virtual DeviceType DeviceType { get; set; }
         public virtual Room Room { get; set; }
+        public virtual ICollection<Feedback> Feedbacks { get; set; }
     }
 }

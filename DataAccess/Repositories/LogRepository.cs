@@ -1,54 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BusinessObject.Models;
+﻿using BusinessObject.Models;
 using DataAccess.IRepositories;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DataAccess.Repositories
 {
-    public class FeedbackRepository: IFeedbackRepository
+    public class LogRepository : ILogRepository
     {
         private readonly FacilityFeedbackManagementContext _facilityFeedbackManagementContext;
 
-        public FeedbackRepository(FacilityFeedbackManagementContext facilityFeedbackManagementContext)
+        public LogRepository(FacilityFeedbackManagementContext facilityFeedbackManagementContext)
         {
             _facilityFeedbackManagementContext = facilityFeedbackManagementContext;
         }
-
-        public async Task Create(Feedback feedback)
+        public async Task Create(Log log)
         {
-            Feedback _feedback = null;
+            Log _log = null;
             try
             {
-                _feedback = await GetFeedback(feedback.Id);
-                if (_feedback != null)
+                _log = await GetLog(log.Id);
+                if (_log != null)
                 {
                     throw new Exception("Create fail: " + "Id existed");
                 }
-                await _facilityFeedbackManagementContext.Feedbacks.AddAsync(feedback);
+                await _facilityFeedbackManagementContext.Logs.AddAsync(log);
                 await _facilityFeedbackManagementContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception("Create fail: "+ex.Message);
+                throw new Exception("Create fail: " + ex.Message);
             }
         }
 
         public async Task Delete(int id)
         {
-            Feedback feedback;
+            Log log;
             try
             {
-                feedback = await GetFeedback(id);
-                if (feedback == null)
+                log = await GetLog(id);
+                if (log == null)
                 {
                     throw new Exception("Delete fail: " + "Id not found");
                 }
-                feedback.IsDeleted = true;
+                log.IsDeleted = true;
 
-                await Update(feedback);
+                await Update(log);
             }
             catch (Exception ex)
             {
@@ -56,49 +56,49 @@ namespace DataAccess.Repositories
             }
         }
 
-        public async Task<Feedback> GetFeedback(int id)
+        public async Task<Log> GetLog(int id)
         {
-            Feedback feedback = null;
+            Log log = null;
             try
             {
-                feedback = await _facilityFeedbackManagementContext.Feedbacks.Where(f => f.IsDeleted == false && f.Id.Equals(id)).FirstAsync();
+                log = await _facilityFeedbackManagementContext.Logs.Where(f => f.IsDeleted == false && f.Id.Equals(id)).FirstAsync();
             }
             catch (Exception ex)
             {
                 throw new Exception("Get fail: " + ex.Message);
             }
 
-            return feedback;
+            return log;
         }
 
-        public async Task<IEnumerable<Feedback>> GetList()
+        public async Task<IEnumerable<Log>> GetList()
         {
-            IEnumerable<Feedback> feedbacks = null;
+            IEnumerable<Log> logs = null;
             try
             {
-                feedbacks = await _facilityFeedbackManagementContext.Feedbacks
-                    .Where(f=>f.IsDeleted == false)
-                    .Include("User").Include("Room").Include("Device").ToListAsync();
+                logs = await _facilityFeedbackManagementContext.Logs
+                    .Where(f => f.IsDeleted == false)
+                    .Include("Feedback").Include("Device").ToListAsync();
             }
             catch (Exception ex)
             {
                 throw new Exception("Get fail: " + ex.Message);
             }
 
-            return feedbacks;
+            return logs;
         }
 
-        public async Task Update(Feedback _feedback)
+        public async Task Update(Log _log)
         {
-            Feedback feedback;
+            Log log;
             try
             {
-                feedback = await GetFeedback(_feedback.Id);
-                if (feedback == null)
+                log = await GetLog(_log.Id);
+                if (log == null)
                 {
                     throw new Exception("Update fail: " + "Id not found");
                 }
-                _facilityFeedbackManagementContext.Feedbacks.Update(feedback);
+                _facilityFeedbackManagementContext.Logs.Update(log);
                 _facilityFeedbackManagementContext.SaveChanges();
             }
             catch (Exception ex)
@@ -108,4 +108,3 @@ namespace DataAccess.Repositories
         }
     }
 }
-

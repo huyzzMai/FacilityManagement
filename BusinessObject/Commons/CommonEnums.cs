@@ -31,5 +31,12 @@ namespace BusinessObject.Commons
             public const int ACTIVE = 0;
             public const int INACTIVE = 1;
         }
+
+        public class FEEDBACKSTATUS
+        {
+            public const int PENDING = 1;
+            public const int FIXED = 2;
+            public const int DENY = 3;
+        }
     }
 }
