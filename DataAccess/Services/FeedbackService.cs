@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BusinessObject.Models;
+using BusinessObject.RequestModel.FeedbackRequest;
+using BusinessObject.ResponseModel.FeedbackResponse;
 using DataAccess.IRepositories;
 using DataAccess.IServices;
 
@@ -16,10 +19,33 @@ namespace DataAccess.Services
             _feedbackRepository = feedbackRepository;
         }
 
-        async Task IFeedbackService.CreateFeedback(Feedback feedback)
+        async Task IFeedbackService.UpdateFeedback(int id, FeedbackRequest feedbackRequest)
         {
             try
             {
+                Feedback feedback = await _feedbackRepository.GetFeedback(id);
+
+                feedback.RoomId = feedbackRequest.roomId;
+                feedback.UserId = feedbackRequest.userId;
+
+                await _feedbackRepository.Update(feedback);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        async Task IFeedbackService.CreateFeedback(FeedbackRequest feedbackRequest)
+        {
+            try
+            {
+                Feedback feedback = new Feedback()
+                {
+                    UserId = feedbackRequest.userId,
+                    RoomId = feedbackRequest.roomId,
+                    DeviceId = feedbackRequest.deviceId
+                };
                 await _feedbackRepository.Create(feedback);
             }
             catch (Exception ex)
@@ -28,11 +54,14 @@ namespace DataAccess.Services
             }
         }
 
-        async Task<IEnumerable<Feedback>> IFeedbackService.GetAllFeedback()
+        async Task<IEnumerable<FeedbackResponse>> IFeedbackService.GetAllFeedback()
         {
             try
             {
-                return await _feedbackRepository.GetList();
+                IEnumerable<Feedback> feedbacks = await _feedbackRepository.GetList();
+                IEnumerable <FeedbackResponse> feedbackRequests = feedbacks
+                    .Select(f => new FeedbackResponse() { id = f.Id, userName = f.User.FullName, roomName = f.Room.Name, deviceName = f.Device.Name, description = f.Description, status = f.Status.ToString() });
+                return feedbackRequests;
             }
             catch (Exception ex)
             {
@@ -40,11 +69,31 @@ namespace DataAccess.Services
             }
         }
 
-        async Task<Feedback> IFeedbackService.GetFeedbackById(int id)
+        async Task<FeedbackResponse> IFeedbackService.GetFeedbackById(int id)
         {
             try
             {
-                return await _feedbackRepository.GetFeedback(id);
+                Feedback feedback = await _feedbackRepository.GetFeedback(id);
+                return new FeedbackResponse() {
+                    id = feedback.Id,
+                    userName = feedback.User.FullName,
+                    roomName = feedback.Room.Name,
+                    deviceName = feedback.Device.Name, 
+                    description = feedback.Description,
+                    status = feedback.Status.ToString()
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        async Task IFeedbackService.DeleteFeedback(int id)
+        {
+            try
+            {
+                await _feedbackRepository.Delete(id);
             }
             catch (Exception ex)
             {

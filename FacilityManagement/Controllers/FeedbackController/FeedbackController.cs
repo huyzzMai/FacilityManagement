@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BusinessObject.Models;
 using DataAccess.IServices;
+using BusinessObject.ResponseModel.FeedbackResponse;
+using BusinessObject.Commons;
+using BusinessObject.RequestModel.FeedbackRequest;
 
 namespace FacilityManagement.Controllers.FeedbackController
 {
@@ -23,14 +26,38 @@ namespace FacilityManagement.Controllers.FeedbackController
 
         // GET: api/Feedback
         [HttpGet]
-        public async Task<IEnumerable<Feedback>> GetFeedbacks()
+        public async Task<IEnumerable<FeedbackResponse>> GetFeedbacks()
         {
-            return await _service.GetAllFeedback();
+            IEnumerable<FeedbackResponse> feedbacks = await _service.GetAllFeedback();
+
+            feedbacks = feedbacks.Select(r =>
+            {
+                string status;
+
+                switch (Int32.Parse(r.status))
+                {
+                    case CommonEnums.FEEDBACKSTATUS.FIXED:
+                        status = "FIXED";
+                        break;
+                    case CommonEnums.FEEDBACKSTATUS.PENDING:
+                        status = "PENDING";
+                        break;
+                    case CommonEnums.FEEDBACKSTATUS.DENY:
+                        status = "DENY";
+                        break;
+                    default:
+                        status = "UNDIFINED";
+                        break;
+                }
+                r.status = status;
+                return r;
+            }).ToList();
+            return feedbacks;
         }
 
         // GET: api/Feedback/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Feedback>> GetFeedback(int id)
+        public async Task<ActionResult<FeedbackResponse>> GetFeedback(int id)
         {
             var feedback = await _service.GetFeedbackById(id);
 
@@ -45,11 +72,11 @@ namespace FacilityManagement.Controllers.FeedbackController
         // PUT: api/Feedback/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutFeedback(int id, Feedback feedback)
+        public async Task<IActionResult> PutFeedback(int id, FeedbackRequest feedback)
         {
             try
             {
-                await _service.CreateFeedback(feedback);
+                await _service.UpdateFeedback(id, feedback);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -62,28 +89,22 @@ namespace FacilityManagement.Controllers.FeedbackController
 
         // POST: api/Feedback
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<Feedback>> PostFeedback(Feedback feedback)
-        //{
-        //    _service.Feedbacks.Add(feedback);
-        //    try
-        //    {
-        //        await _service.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateException)
-        //    {
-        //        if (FeedbackExists(feedback.Id))
-        //        {
-        //            return Conflict();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
+        [HttpPost]
+        public async Task<ActionResult<FeedbackRequest>> PostFeedback(FeedbackRequest feedbackRequest)
+        {
 
-        //    return CreatedAtAction("GetFeedback", new { id = feedback.Id }, feedback);
-        //}
+            try
+            {
+                await _service.CreateFeedback(feedbackRequest);
+            }
+            catch (DbUpdateException)
+            {
+
+                throw;
+            }
+
+            return CreatedAtAction("GetFeedback", new { id = feedbackRequest.id }, feedbackRequest);
+        }
 
         // DELETE: api/Feedback/5
         //[HttpDelete("{id}")]

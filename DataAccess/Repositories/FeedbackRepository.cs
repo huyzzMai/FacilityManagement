@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BusinessObject.Models;
 using DataAccess.IRepositories;
@@ -37,7 +38,7 @@ namespace DataAccess.Repositories
 
         public async Task Delete(int id)
         {
-            Feedback feedback = null;
+            Feedback feedback;
             try
             {
                 feedback = await GetFeedback(id);
@@ -45,8 +46,9 @@ namespace DataAccess.Repositories
                 {
                     throw new Exception("Delete fail: " + "Id not found");
                 }
-                _facilityFeedbackManagementContext.Feedbacks.Remove(feedback);
-                await _facilityFeedbackManagementContext.SaveChangesAsync();
+                feedback.IsDeleted = true;
+
+                await Update(feedback);
             }
             catch (Exception ex)
             {
@@ -59,7 +61,7 @@ namespace DataAccess.Repositories
             Feedback feedback = null;
             try
             {
-                feedback = await _facilityFeedbackManagementContext.Feedbacks.FindAsync(id);
+                feedback = await _facilityFeedbackManagementContext.Feedbacks.Where(f => f.IsDeleted == false && f.Id.Equals(id)).FirstAsync();
             }
             catch (Exception ex)
             {
@@ -74,7 +76,9 @@ namespace DataAccess.Repositories
             IEnumerable<Feedback> feedbacks = null;
             try
             {
-                feedbacks = await _facilityFeedbackManagementContext.Feedbacks.ToListAsync();
+                feedbacks = await _facilityFeedbackManagementContext.Feedbacks
+                    .Where(f=>f.IsDeleted == false)
+                    .Include("User").Include("Room").Include("Device").ToListAsync();
             }
             catch (Exception ex)
             {
@@ -86,7 +90,7 @@ namespace DataAccess.Repositories
 
         public async Task Update(Feedback _feedback)
         {
-            Feedback feedback = null;
+            Feedback feedback;
             try
             {
                 feedback = await GetFeedback(_feedback.Id);

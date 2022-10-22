@@ -10,7 +10,6 @@ namespace BusinessObject.Models
         public DeviceType()
         {
             Devices = new HashSet<Device>();
-            Feedbacks = new HashSet<Feedback>();
         }
 
         public int Id { get; set; }
@@ -25,6 +24,5 @@ namespace BusinessObject.Models
 
         public virtual Department Department { get; set; }
         public virtual ICollection<Device> Devices { get; set; }
-        public virtual ICollection<Feedback> Feedbacks { get; set; }
     }
 }
