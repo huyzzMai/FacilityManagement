@@ -6,6 +6,7 @@ using DataAccess.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -38,10 +39,19 @@ namespace FacilityManagement
             services.AddDbContext<FacilityFeedbackManagementContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
 
+            // Use for user repo and service
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+
+            // Use for room repo and service
+            services.AddScoped<IRoomService, RoomService>();
+            services.AddScoped<IRoomRepository, RoomRepository>();
+
+            // Use for department repo and service
+            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+            services.AddScoped<IDepartmentService, DepartmentService>();
 
             services.AddCors();
 
@@ -54,6 +64,22 @@ namespace FacilityManagement
             x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddGoogle(opts =>
+                {
+                    //opts.ClientId = Configuration["ClientId"];
+                    //opts.ClientSecret = Configuration["ClientSecret"];
+                    //opts.SignInScheme = IdentityConstants.ExternalScheme;
+
+                    // Read information Authentication:Google from appsettings.json
+                    IConfigurationSection googleAuthNSection = Configuration.GetSection("Authentication:Google");
+
+                    // Set up ClientID và ClientSecret for API google
+                    opts.ClientId = googleAuthNSection["ClientId"];
+                    opts.ClientSecret = googleAuthNSection["ClientSecret"];
+
+                    // Set up Url callback from Google 
+                    opts.CallbackPath = "/api/authen/google-login";
+                })
                 .AddJwtBearer(options =>
                 {
                     options.RequireHttpsMetadata = false;
