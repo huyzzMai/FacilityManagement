@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using BusinessObject.Commons;
+using BusinessObject.ResponseModel.UserResponse;
+using BusinessObject.RequestModel.UserReqest;
 
 namespace DataAccess.Services
 {
@@ -61,7 +63,7 @@ namespace DataAccess.Services
                 {
                     var claims = new[]
                     {
-                    new Claim(ClaimTypes.Role, "Student"),
+                    new Claim(ClaimTypes.Role, "User"),
                     new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
@@ -80,6 +82,143 @@ namespace DataAccess.Services
                     };
                     return result;
                 }
+        }
+
+        public async Task<LoginResponse> LoginUserForGoogle(User user)
+        {
+            String userId = user.Id.ToString();
+
+            var claims = new[]
+                    {
+                    new Claim(ClaimTypes.Role, "User"),
+                    new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    new Claim("Id", userId)
+                    };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+
+            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], claims, expires: DateTime.UtcNow.AddDays(1), signingCredentials: signIn);
+
+            var result = new LoginResponse()
+            {
+                Token = token
+            };
+            return result;
+        }
+
+        public async Task<IEnumerable<UserResponse>> GetAllUsers()
+        {
+            var users = await userRepository.GetAllUsers();
+            IEnumerable<UserResponse> result = users.Select(
+                user =>
+                {
+                    // Cast role from int to string for response
+                    string role, status;
+                    if (user.Role == CommonEnums.ROLE.ADMIN)
+                    {
+                        role = "Admin";
+                    }
+                    else
+                    {
+                        role = "Student";
+                    }
+                    if (user.Status == CommonEnums.USERSTATUS.ACTIVE)
+                    {
+                        status = "Active";
+                    }
+                    else
+                    {
+                        status = "Inactive";
+                    }
+
+                    return new UserResponse()
+                    {
+                        FullName = user.FullName,
+                        Email = user.Email,
+                        Image = user.Image,
+                        Role = role,
+                        Status = status
+                    };
+                }
+                )
+                .ToList();
+            return result;  
+        }
+
+        public async Task<User> GetUserById(int id)
+        {
+            User u = await userRepository.GetUserAndDeleteIsFalse(id);
+            return u;
+        }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            User u = await userRepository.GetUerByEmailAndDeleteIsFalse(email);
+            return u;
+        }
+
+        public async Task<User> CreateUserByGoogleLogin(GoogleUserCreateRequest request)
+        {
+            User u = new User()
+            {
+                FullName = request.FullName,
+                Email = request.Email,
+                Image = request.Img,
+                Role = CommonEnums.ROLE.USER,
+                IsDeleted = false,
+                CreatedAt = DateTime.Now
+            };
+
+            await userRepository.SaveCreateUser(u);
+
+            return u;
+        }
+
+        public async Task<UserResponse> UpdateUser(int id, UserRequest model)
+        {
+            var u = await userRepository.GetUserAndDeleteIsFalse(id);
+
+            if(u == null)
+            {
+                throw new Exception("This user cannot be updated!");
+            }
+
+            u.FullName = model.FullName;
+            u.Email = model.Email;
+            u.Image = model.Image;
+            u.UpdatedAt = DateTime.Now;
+
+            await userRepository.SaveUser(u);
+
+            var upuser = new UserResponse()
+            {
+                FullName = u.FullName,
+                Email = u.Email,
+                Image = u.Image
+
+            };
+
+            return upuser;
+        }
+
+        public async Task DeleteUser(int id)
+        {
+            User u = await userRepository.GetUserAndDeleteIsFalse(id);
+
+            if(u == null)
+            {
+                throw new Exception("This user is unavailable to delete.");
+            }
+            
+            u.IsDeleted = true;
+            u.Status = CommonEnums.USERSTATUS.INACTIVE;
+            u.UpdatedAt = DateTime.Now;
+
+            await userRepository.SaveUser(u);
         }
 
     }

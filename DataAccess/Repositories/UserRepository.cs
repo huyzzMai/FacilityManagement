@@ -18,10 +18,41 @@ namespace DataAccess.Repositories
             this.dbContext = dbContext;
         }
 
+        public async Task<List<User>> GetAllUsers()
+        {
+            List<User> users = await dbContext.Users.ToListAsync();
+            return users;
+        }
+
+        public async Task<User> GetUserAndDeleteIsFalse(int id)
+        {
+            User us = await dbContext.Users.Where(u => u.Id.Equals(id) && u.IsDeleted == false)
+                .FirstOrDefaultAsync();
+            return us;
+        }
+
         public async Task<User> GetUserByEmailAndPassword(string email, string password)
         {
             User user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.Password == password);
             return user;    
+        }
+
+        public async Task<User> GetUerByEmailAndDeleteIsFalse(string email)
+        {
+            User user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.IsDeleted == false);
+            return user;
+        }
+
+        public async Task SaveUser(User user)
+        {
+            dbContext.Users.Update(user);
+            await dbContext.SaveChangesAsync();
+        }
+            
+        public async Task SaveCreateUser(User user)
+        {
+            dbContext.Users.Add(user);
+            await dbContext.SaveChangesAsync();
         }
     }
 }

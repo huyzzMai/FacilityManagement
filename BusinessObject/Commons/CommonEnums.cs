@@ -11,7 +11,25 @@ namespace BusinessObject.Commons
         public class ROLE
         {
             public const int ADMIN = 1;
-            public const int STUDENT = 2;
+            public const int USER = 2;
+        }
+
+        public class DEPARTMENTSTATUS
+        {
+            public const int ACTIVE = 0;
+            public const int INACTIVE = 1;
+        }
+
+        public class USERSTATUS
+        {
+            public const int ACTIVE = 0;
+            public const int INACTIVE = 1;  
+        }
+
+        public class ROOMSTATUS
+        {
+            public const int ACTIVE = 0;
+            public const int INACTIVE = 1;
         }
 
         public class FEEDBACKSTATUS

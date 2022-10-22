@@ -45,7 +45,7 @@ namespace BusinessObject.Models
             {
                 entity.ToTable("Department");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
 
@@ -218,7 +218,7 @@ namespace BusinessObject.Models
             {
                 entity.ToTable("Room");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
 
@@ -245,7 +245,7 @@ namespace BusinessObject.Models
             {
                 entity.ToTable("User");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id);
 
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
 
