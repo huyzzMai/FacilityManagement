@@ -11,6 +11,6 @@ namespace BusinessObject.ResponseModel.RoomResponse
             public string Name { get; set; }
             public string Level { get; set; }
             public string Status { get; set; }
-        }
     }
+}
 

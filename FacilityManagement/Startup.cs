@@ -46,6 +46,8 @@ namespace FacilityManagement
             // Use for room repo and service
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IRoomRepository, RoomRepository>();
+            services.AddScoped<IDeviceTypeService, DeviceTypeService>();
+            services.AddScoped<IDeviceTypeRepository, DeviceTypeRepository>();
 
             // Use for department repo and service
             services.AddScoped<IDepartmentRepository, DepartmentRepository>();
