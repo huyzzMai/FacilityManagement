@@ -43,6 +43,8 @@ namespace FacilityManagement
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IRoomRepository, RoomRepository>();
+            services.AddScoped<IDeviceTypeService, DeviceTypeService>();
+            services.AddScoped<IDeviceTypeRepository, DeviceTypeRepository>();
 
             services.AddCors();
 
