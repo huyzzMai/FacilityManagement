@@ -19,21 +19,20 @@ namespace DataAccess.Repositories
 
         public async Task Create(Feedback feedback)
         {
-            Feedback _feedback = null;
-            try
-            {
-                _feedback = await GetFeedback(feedback.Id);
+            //try
+            //{
+                Feedback _feedback = await GetFeedback(feedback.Id);
                 if (_feedback != null)
                 {
                     throw new Exception("Create fail: " + "Id existed");
                 }
                 await _facilityFeedbackManagementContext.Feedbacks.AddAsync(feedback);
                 await _facilityFeedbackManagementContext.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Create fail: "+ex.Message);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw new Exception("Create fail: "+ex.Message);
+            //}
         }
 
         public async Task Delete(int id)
@@ -47,6 +46,8 @@ namespace DataAccess.Repositories
                     throw new Exception("Delete fail: " + "Id not found");
                 }
                 feedback.IsDeleted = true;
+                feedback.UpdatedBy = "system";
+                feedback.UpdatedAt = DateTime.Now;
 
                 await Update(feedback);
             }
@@ -61,7 +62,14 @@ namespace DataAccess.Repositories
             Feedback feedback = null;
             try
             {
-                feedback = await _facilityFeedbackManagementContext.Feedbacks.Where(f => f.IsDeleted == false && f.Id.Equals(id)).FirstAsync();
+                feedback = await _facilityFeedbackManagementContext
+                    .Feedbacks
+                    .Where(f => f.IsDeleted == false && f.Id.Equals(id))
+                    .Include("User")
+                    .Include("Room")
+                    .Include("Device")
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -78,7 +86,7 @@ namespace DataAccess.Repositories
             {
                 feedbacks = await _facilityFeedbackManagementContext.Feedbacks
                     .Where(f=>f.IsDeleted == false)
-                    .Include("User").Include("Room").Include("Device").ToListAsync();
+                    .Include("User").Include("Room").Include("Device").AsNoTracking().ToListAsync();
             }
             catch (Exception ex)
             {
@@ -98,7 +106,7 @@ namespace DataAccess.Repositories
                 {
                     throw new Exception("Update fail: " + "Id not found");
                 }
-                _facilityFeedbackManagementContext.Feedbacks.Update(feedback);
+                _facilityFeedbackManagementContext.Feedbacks.Update(_feedback);
                 _facilityFeedbackManagementContext.SaveChanges();
             }
             catch (Exception ex)

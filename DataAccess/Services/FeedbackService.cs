@@ -27,6 +27,8 @@ namespace DataAccess.Services
 
                 feedback.RoomId = feedbackRequest.roomId;
                 feedback.UserId = feedbackRequest.userId;
+                feedback.UpdatedAt = DateTime.Today;
+                feedback.UpdatedBy = feedbackRequest.userId.ToString();
                 feedback.Description = feedbackRequest.description;
 
                 await _feedbackRepository.Update(feedback);
@@ -37,22 +39,31 @@ namespace DataAccess.Services
             }
         }
 
-        async Task IFeedbackService.CreateFeedback(FeedbackRequest feedbackRequest)
+        async Task<int> IFeedbackService.CreateFeedback(FeedbackRequest feedbackRequest)
         {
-            try
-            {
+            //try
+            //{
                 Feedback feedback = new Feedback()
                 {
                     UserId = feedbackRequest.userId,
                     RoomId = feedbackRequest.roomId,
-                    DeviceId = feedbackRequest.deviceId
+                    DeviceId = feedbackRequest.deviceId,
+                    Description = feedbackRequest.description,
+                    Image = feedbackRequest.image,
+                    Status = 1,
+                    IsDeleted = false,
+                    CreatedAt = DateTime.Today,
+                    CreatedBy = feedbackRequest.userId.ToString(),
+
                 };
                 await _feedbackRepository.Create(feedback);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+
+                return feedback.Id;
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw new Exception(ex.Message);
+            //}
         }
 
         async Task<IEnumerable<FeedbackResponse>> IFeedbackService.GetAllFeedback()

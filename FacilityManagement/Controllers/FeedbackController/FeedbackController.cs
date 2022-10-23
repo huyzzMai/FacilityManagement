@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BusinessObject.Models;
 using DataAccess.IServices;
 using BusinessObject.ResponseModel.FeedbackResponse;
 using BusinessObject.Commons;
 using BusinessObject.RequestModel.FeedbackRequest;
+using System.Diagnostics;
 
 namespace FacilityManagement.Controllers.FeedbackController
 {
@@ -92,10 +91,10 @@ namespace FacilityManagement.Controllers.FeedbackController
         [HttpPost]
         public async Task<ActionResult<FeedbackRequest>> PostFeedback(FeedbackRequest feedbackRequest)
         {
-
+            int response;
             try
             {
-                await _service.CreateFeedback(feedbackRequest);
+                response = await _service.CreateFeedback(feedbackRequest);
             }
             catch (DbUpdateException)
             {
@@ -103,24 +102,24 @@ namespace FacilityManagement.Controllers.FeedbackController
                 throw;
             }
 
-            return CreatedAtAction("GetFeedback", new { id = feedbackRequest.id }, feedbackRequest);
+            return CreatedAtAction("GetFeedback", new { id = response }, feedbackRequest);
         }
 
         // DELETE: api/Feedback/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteFeedback(int id)
-        //{
-        //    var feedback = await _service.Feedbacks.FindAsync(id);
-        //    if (feedback == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteFeedback(int id)
+        {
+            try
+            {
+                await _service.DeleteFeedback(id);
+            }
+            catch (DbUpdateException)
+            {
 
-        //    _service.Feedbacks.Remove(feedback);
-        //    await _service.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
+                throw;
+            }
+            return CreatedAtAction("GetFeedbacks", "Feedback is deleted");
+        }
 
         //private bool FeedbackExists(int id)
         //{
