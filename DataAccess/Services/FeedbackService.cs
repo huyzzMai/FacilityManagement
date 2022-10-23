@@ -13,10 +13,12 @@ namespace DataAccess.Services
     public class FeedbackService : IFeedbackService
     {
         private readonly IFeedbackRepository _feedbackRepository;
+        private readonly ILogRepository _logRepository;
 
-        public FeedbackService(IFeedbackRepository feedbackRepository)
+        public FeedbackService(IFeedbackRepository feedbackRepository, ILogRepository logRepository)
         {
             _feedbackRepository = feedbackRepository;
+            _logRepository = logRepository;
         }
 
         async Task IFeedbackService.UpdateFeedback(int id, FeedbackUpdateRequest feedbackRequest)
@@ -26,17 +28,35 @@ namespace DataAccess.Services
                 Feedback feedback = await _feedbackRepository.GetFeedback(id);
 
                 feedback.RoomId = feedbackRequest.roomId ??= feedback.RoomId;
-                feedback.UserId = feedbackRequest.userId ??= feedback.UserId;
                 feedback.Flag = feedbackRequest.flag ??= feedback.Flag;
                 feedback.DeviceId = feedbackRequest.deviceId ??= feedback.DeviceId;
                 feedback.Description = feedbackRequest.description ??= feedback.Description;
                 feedback.Image = feedbackRequest.image ??= feedback.Image;
                 feedback.Status = feedbackRequest.status ??= feedback.Status;
 
-                feedback.UpdatedAt = DateTime.Today;
-                feedback.UpdatedBy = "system";
+                if (feedback.Equals(await _feedbackRepository.GetFeedback(id)))
+                {
+                    //update if changed
+                    feedback.UpdatedAt = DateTime.Today;
+                    feedback.UpdatedBy = "system";
 
-                await _feedbackRepository.Update(feedback);
+                    await _feedbackRepository.Update(feedback);
+
+
+                    //create log
+                    Log log = new()
+                    {
+                        FeedbackId = feedback.Id,
+                        DeviceId = feedback.Id,
+                        Status = feedback.Status,
+                        Description = feedback.Description,
+                        IsDeleted = false,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = "system",
+                    };
+                    await _logRepository.Create(log);
+                }
+
             }
             catch (Exception ex)
             {
@@ -46,9 +66,9 @@ namespace DataAccess.Services
 
         async Task<int> IFeedbackService.CreateFeedback(FeedbackRequest feedbackRequest)
         {
-            //try
-            //{
-                Feedback feedback = new Feedback()
+            try
+            {
+                Feedback feedback = new()
                 {
                     UserId = feedbackRequest.userId,
                     RoomId = feedbackRequest.roomId,
@@ -63,12 +83,25 @@ namespace DataAccess.Services
                 };
                 await _feedbackRepository.Create(feedback);
 
+                //create log
+                Log log = new()
+                {
+                    FeedbackId = feedback.Id,
+                    DeviceId = feedback.Id,
+                    Status = feedback.Status,
+                    Description = feedback.Description,
+                    IsDeleted = false,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = "system",
+                };
+                await _logRepository.Create(log);
+
                 return feedback.Id;
-            //}
-            //catch (Exception ex)
-            //{
-            //    throw new Exception(ex.Message);
-            //}
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         async Task<IEnumerable<FeedbackResponse>> IFeedbackService.GetAllFeedback()
