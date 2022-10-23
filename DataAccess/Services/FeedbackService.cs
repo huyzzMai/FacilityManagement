@@ -19,17 +19,22 @@ namespace DataAccess.Services
             _feedbackRepository = feedbackRepository;
         }
 
-        async Task IFeedbackService.UpdateFeedback(int id, FeedbackRequest feedbackRequest)
+        async Task IFeedbackService.UpdateFeedback(int id, FeedbackUpdateRequest feedbackRequest)
         {
             try
             {
                 Feedback feedback = await _feedbackRepository.GetFeedback(id);
 
-                feedback.RoomId = feedbackRequest.roomId;
-                feedback.UserId = feedbackRequest.userId;
+                feedback.RoomId = feedbackRequest.roomId ??= feedback.RoomId;
+                feedback.UserId = feedbackRequest.userId ??= feedback.UserId;
+                feedback.Flag = feedbackRequest.flag ??= feedback.Flag;
+                feedback.DeviceId = feedbackRequest.deviceId ??= feedback.DeviceId;
+                feedback.Description = feedbackRequest.description ??= feedback.Description;
+                feedback.Image = feedbackRequest.image ??= feedback.Image;
+                feedback.Status = feedbackRequest.status ??= feedback.Status;
+
                 feedback.UpdatedAt = DateTime.Today;
-                feedback.UpdatedBy = feedbackRequest.userId.ToString();
-                feedback.Description = feedbackRequest.description;
+                feedback.UpdatedBy = "system";
 
                 await _feedbackRepository.Update(feedback);
             }
