@@ -77,6 +77,7 @@ namespace DataAccess.Services
                 r.Name = rooms.Name;
                 r.Level = rooms.Level;
                 r.Status = rooms.Status;
+                r.UpdatedAt = DateTime.Now;
 
                 await roomRepository.UpdateRoom(r);
 
@@ -105,6 +106,7 @@ namespace DataAccess.Services
                 rms.Level = rooms.Level;
                 rms.Status = rooms.Status;
                 rms.IsDeleted = false;
+                rms.CreatedAt = DateTime.Now;
                 await roomRepository.SaveRoom(rms);
 
                 var uproom = new RoomResponse()
