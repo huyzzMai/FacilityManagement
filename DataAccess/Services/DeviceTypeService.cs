@@ -58,7 +58,7 @@ namespace DataAccess.Services
                 {
                     // Cast status from int to string for response
                     string status;
-                    if (device.Status == CommonEnums.ROOMSTATUS.ACTIVE)
+                    if (device.Status == CommonEnums.DEVICETYPETATUS.ACTIVE)
                     {
                         status = "Active";
                     }
@@ -91,6 +91,7 @@ namespace DataAccess.Services
                 r.DepartmentId = devices.DepartmentId;
                 r.Name = devices.Name;
                 r.Status = devices.Status;
+                r.UpdatedAt = DateTime.Now;
 
                 await deviceTypeRepository.UpdateDeviceType(r);
 
@@ -118,6 +119,7 @@ namespace DataAccess.Services
                 rms.Name = devices.Name;
                 rms.Status = devices.Status;
                 rms.IsDeleted = false;
+                rms.CreatedAt = DateTime.Now;
                 await deviceTypeRepository.SaveDeviceType(rms);
 
                 var updevice = new DeviceTypeResponse()

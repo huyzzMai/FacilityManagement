@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System;
-using BusinessObject.RequestModel.RoomRequest;
-using DataAccess.Services;
 using BusinessObject.RequestModel.DeviceTypeRequest;
-using BusinessObject.Models;
 
 namespace FacilityManagement.Controllers.DeviceType
 {
