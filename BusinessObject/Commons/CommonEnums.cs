@@ -19,8 +19,12 @@ namespace BusinessObject.Commons
             public const int ACTIVE = 0;
             public const int INACTIVE = 1;
         }
-
-        public class USERSTATUS
+        public class DEVICETYPETATUS
+        {
+            public const int ACTIVE = 0;
+            public const int INACTIVE = 1;
+        }
+            public class USERSTATUS
         {
             public const int ACTIVE = 0;
             public const int INACTIVE = 1;  

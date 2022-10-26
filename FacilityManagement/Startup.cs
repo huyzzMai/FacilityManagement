@@ -6,21 +6,14 @@ using DataAccess.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace FacilityManagement
 {
@@ -48,6 +41,12 @@ namespace FacilityManagement
             // Use for room repo and service
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IRoomRepository, RoomRepository>();
+
+            // Use for Device & deviceType repo and service
+            services.AddScoped<IDeviceTypeService, DeviceTypeService>();
+            services.AddScoped<IDeviceTypeRepository, DeviceTypeRepository>();
+            services.AddScoped<IDeviceService, DeviceService>();
+            services.AddScoped<IDeviceRepository, DeviceRepository>();
 
             // Use for department repo and service
             services.AddScoped<IDepartmentRepository, DepartmentRepository>();
