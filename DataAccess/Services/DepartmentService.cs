@@ -67,7 +67,9 @@ namespace DataAccess.Services
                 Name = request.DepartmentName,
                 Status = CommonEnums.DEPARTMENTSTATUS.ACTIVE,
                 IsDeleted = false,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                CreatedBy = "Admin"
+                
             };
 
             await departmentRepository.SaveCreateDepartment(d);

@@ -1,5 +1,6 @@
 ﻿using BusinessObject.RequestModel.DepartmentRequest;
 using DataAccess.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -9,6 +10,7 @@ namespace FacilityManagement.Controllers.DepartmentController
 {
     [Route("api/department")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService departmentService;

@@ -6,11 +6,13 @@ using System;
 using BusinessObject.Models;
 using BusinessObject.RequestModel.RoomRequest;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FacilityManagement.Controllers.RoomController
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin, User")]
     public class RoomController : ControllerBase
     {
         private readonly IRoomService roomService;
@@ -19,7 +21,7 @@ namespace FacilityManagement.Controllers.RoomController
         {
             this.roomService = roomService;
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> GetAllRooms()
         {
@@ -32,6 +34,8 @@ namespace FacilityManagement.Controllers.RoomController
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
             }
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] RoomRequest rooms)
         {
@@ -59,6 +63,7 @@ namespace FacilityManagement.Controllers.RoomController
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateRoom(int id,[FromBody] RoomRequest rooms)
         {
@@ -84,6 +89,7 @@ namespace FacilityManagement.Controllers.RoomController
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteRoom(int id)
         {

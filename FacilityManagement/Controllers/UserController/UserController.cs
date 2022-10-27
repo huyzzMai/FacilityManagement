@@ -1,5 +1,6 @@
 ﻿using BusinessObject.RequestModel.UserReqest;
 using DataAccess.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -9,6 +10,7 @@ namespace FacilityManagement.Controllers.UserController
 {
     [Route("api/user")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class UserController : ControllerBase
     {
         private readonly IUserService userService;
