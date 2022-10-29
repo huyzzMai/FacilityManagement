@@ -11,7 +11,7 @@ namespace BusinessObject.Models
         public int DeviceTypeId { get; set; }
         public int? RoomId { get; set; }
         public string Name { get; set; }
-        public string Status { get; set; }
+        public int? Status { get; set; }
         public bool? IsDeleted { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
@@ -20,5 +20,6 @@ namespace BusinessObject.Models
 
         public virtual DeviceType DeviceType { get; set; }
         public virtual Room Room { get; set; }
+        public virtual ICollection<Feedback> Feedbacks { get; set; }
     }
 }

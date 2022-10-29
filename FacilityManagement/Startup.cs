@@ -36,6 +36,14 @@ namespace FacilityManagement
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserRepository, UserRepository>();
 
+            // Use for feedback repo and service
+            services.AddScoped<IFeedbackService, FeedbackService>();
+            services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+
+            // Use for log repo and service
+            services.AddScoped<ILogService, LogService>();
+            services.AddScoped<ILogRepository, LogRepository>();
+
             // Use for room repo and service
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IRoomRepository, RoomRepository>();
