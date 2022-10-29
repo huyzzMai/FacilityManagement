@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace FacilityManagement.Controllers.DepartmentController
 {
     [Route("api/department")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService departmentService;
@@ -47,7 +48,8 @@ namespace FacilityManagement.Controllers.DepartmentController
                 }
                 else
                 {
-                    return Ok(await departmentService.CreateDepartment(model));
+                    return StatusCode(StatusCodes.Status201Created,
+                    await departmentService.CreateDepartment(model));
                 }
             }
             catch (Exception ex)
