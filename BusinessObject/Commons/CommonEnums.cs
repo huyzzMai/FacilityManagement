@@ -24,7 +24,12 @@ namespace BusinessObject.Commons
             public const int ACTIVE = 0;
             public const int INACTIVE = 1;
         }
-            public class USERSTATUS
+        public class DEVICESTATUS
+        {
+            public const int ACTIVE = 0;
+            public const int INACTIVE = 1;
+        }
+        public class USERSTATUS
         {
             public const int ACTIVE = 0;
             public const int INACTIVE = 1;  
@@ -39,8 +44,18 @@ namespace BusinessObject.Commons
         public class FEEDBACKSTATUS
         {
             public const int PENDING = 1;
-            public const int FIXED = 2;
+            public const int CLOSE = 2;
             public const int DENY = 3;
+            public const int ACCEPT = 4;
+        }
+
+        public class LOGSTATUS
+        {
+            public const int FEEDBACK_CREATE = 1;
+            public const int FEEDBACK_DENY = 2;
+            public const int FEEDBACK_ACCEPT = 3;
+            public const int FEEDBACK_CLOSE = 4;
+
         }
     }
 }

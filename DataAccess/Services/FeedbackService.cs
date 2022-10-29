@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BusinessObject.Commons;
 using BusinessObject.Models;
 using BusinessObject.RequestModel.FeedbackRequest;
 using BusinessObject.ResponseModel.FeedbackResponse;
@@ -14,11 +15,13 @@ namespace DataAccess.Services
     {
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly ILogRepository _logRepository;
+        private readonly IDeviceRepository _deviceRepository;
 
-        public FeedbackService(IFeedbackRepository feedbackRepository, ILogRepository logRepository)
+        public FeedbackService(IFeedbackRepository feedbackRepository, ILogRepository logRepository, IDeviceRepository deviceRepository)
         {
             _feedbackRepository = feedbackRepository;
             _logRepository = logRepository;
+            _deviceRepository = deviceRepository;
         }
 
         async Task IFeedbackService.UpdateFeedback(int id, FeedbackUpdateRequest feedbackRequest)
@@ -47,7 +50,7 @@ namespace DataAccess.Services
                     Log log = new()
                     {
                         FeedbackId = feedback.Id,
-                        DeviceId = feedback.Id,
+                        DeviceId = feedback.DeviceId,
                         Status = feedback.Status,
                         Description = feedback.Description,
                         IsDeleted = false,
@@ -66,8 +69,8 @@ namespace DataAccess.Services
 
         async Task<int> IFeedbackService.CreateFeedback(FeedbackRequest feedbackRequest)
         {
-            try
-            {
+            //try
+            //{
                 Feedback feedback = new()
                 {
                     UserId = feedbackRequest.userId,
@@ -75,7 +78,7 @@ namespace DataAccess.Services
                     DeviceId = feedbackRequest.deviceId,
                     Description = feedbackRequest.description,
                     Image = feedbackRequest.image,
-                    Status = 1,
+                    Status = CommonEnums.FEEDBACKSTATUS.PENDING,
                     IsDeleted = false,
                     CreatedAt = DateTime.Today,
                     CreatedBy = feedbackRequest.userId.ToString(),
@@ -87,8 +90,8 @@ namespace DataAccess.Services
                 Log log = new()
                 {
                     FeedbackId = feedback.Id,
-                    DeviceId = feedback.Id,
-                    Status = feedback.Status,
+                    DeviceId = feedback.DeviceId,
+                    Status = CommonEnums.LOGSTATUS.FEEDBACK_CREATE, 
                     Description = feedback.Description,
                     IsDeleted = false,
                     CreatedAt = DateTime.Now,
@@ -97,11 +100,11 @@ namespace DataAccess.Services
                 await _logRepository.Create(log);
 
                 return feedback.Id;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    throw new Exception(ex.Message);
+            //}
         }
 
         async Task<IEnumerable<FeedbackResponse>> IFeedbackService.GetAllFeedback()
@@ -148,6 +151,97 @@ namespace DataAccess.Services
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task DenyFeedback(int id)
+        {
+            try
+            {
+                var feedback = await _feedbackRepository.GetFeedback(id);
+                feedback.Status = CommonEnums.FEEDBACKSTATUS.DENY;
+                await _feedbackRepository.Update(feedback);
+
+                //create log
+                Log log = new()
+                {
+                    FeedbackId = feedback.Id,
+                    DeviceId = feedback.DeviceId,
+                    Status = CommonEnums.LOGSTATUS.FEEDBACK_DENY,
+                    Description = feedback.Description,
+                    IsDeleted = false,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = "system",
+                };
+                await _logRepository.Create(log);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public async Task AcceptFeedback(int id)
+        {
+            try
+            {
+                var feedback = await _feedbackRepository.GetFeedback(id);
+                feedback.Status = CommonEnums.FEEDBACKSTATUS.ACCEPT;
+                await _feedbackRepository.Update(feedback);
+
+                //update device status
+                var device = await _deviceRepository.GetDeviceAndDeleteIsFalse(feedback.DeviceId);
+                device.Status = CommonEnums.DEVICESTATUS.INACTIVE;
+                await _deviceRepository.UpdateDevice(device);
+
+                //create log
+                Log log = new()
+                {
+                    FeedbackId = feedback.Id,
+                    DeviceId = feedback.DeviceId,
+                    Status = CommonEnums.LOGSTATUS.FEEDBACK_ACCEPT,
+                    Description = feedback.Description,
+                    IsDeleted = false,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = "system",
+                };
+                await _logRepository.Create(log);
+        }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+    }
+}
+
+        public async Task CloseFeedback(int id)
+        {
+            try
+            {
+                var feedback = await _feedbackRepository.GetFeedback(id);
+                feedback.Status = CommonEnums.FEEDBACKSTATUS.CLOSE;
+                await _feedbackRepository.Update(feedback);
+
+                //update device status
+                var device = await _deviceRepository.GetDeviceAndDeleteIsFalse(feedback.DeviceId);
+                device.Status = CommonEnums.DEVICESTATUS.ACTIVE;
+                await _deviceRepository.UpdateDevice(device);
+
+                //create log
+                Log log = new()
+                {
+                    FeedbackId = feedback.Id,
+                    DeviceId = feedback.DeviceId,
+                    Status = CommonEnums.LOGSTATUS.FEEDBACK_CLOSE,
+                    Description = feedback.Description,
+                    IsDeleted = false,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = "system",
+                };
+                await _logRepository.Create(log);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }

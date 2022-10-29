@@ -19,11 +19,10 @@ namespace DataAccess.Repositories
         }
         public async Task Create(Log log)
         {
-            Log _log = null;
             try
             {
-                _log = await GetLog(log.Id);
-                if (_log != null)
+                Log _log = await GetLog(log.Id);
+            if (_log != null)
                 {
                     throw new Exception("Create fail: " + "Id existed");
                 }
@@ -61,7 +60,7 @@ namespace DataAccess.Repositories
             Log log = null;
             try
             {
-                log = await _facilityFeedbackManagementContext.Logs.Where(f => f.IsDeleted == false && f.Id.Equals(id)).FirstAsync();
+                log = await _facilityFeedbackManagementContext.Logs.Where(f => f.IsDeleted == false && f.Id.Equals(id)).FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -78,7 +77,7 @@ namespace DataAccess.Repositories
             {
                 logs = await _facilityFeedbackManagementContext.Logs
                     .Where(f => f.IsDeleted == false)
-                    .Include("Feedback").Include("Device").ToListAsync();
+                    .Include("Feedback").Include("Device").AsNoTracking().ToListAsync();
             }
             catch (Exception ex)
             {

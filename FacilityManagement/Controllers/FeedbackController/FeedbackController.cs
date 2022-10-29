@@ -35,14 +35,17 @@ namespace FacilityManagement.Controllers.FeedbackController
 
                 switch (Int32.Parse(r.status))
                 {
-                    case CommonEnums.FEEDBACKSTATUS.FIXED:
-                        status = "FIXED";
+                    case CommonEnums.FEEDBACKSTATUS.CLOSE:
+                        status = "CLOSE";
                         break;
                     case CommonEnums.FEEDBACKSTATUS.PENDING:
                         status = "PENDING";
                         break;
                     case CommonEnums.FEEDBACKSTATUS.DENY:
                         status = "DENY";
+                        break;
+                    case CommonEnums.FEEDBACKSTATUS.ACCEPT:
+                        status = "ACCEPT";
                         break;
                     default:
                         status = "UNDIFINED";
@@ -89,7 +92,7 @@ namespace FacilityManagement.Controllers.FeedbackController
         // POST: api/Feedback
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<FeedbackRequest>> PostFeedback(FeedbackRequest feedbackRequest)
+        public async Task<IActionResult> PostFeedback(FeedbackRequest feedbackRequest)
         {
             int response;
             try
@@ -102,7 +105,7 @@ namespace FacilityManagement.Controllers.FeedbackController
                 throw;
             }
 
-            return CreatedAtAction("GetFeedback", new { id = response }, feedbackRequest);
+            return Ok();
         }
 
         // DELETE: api/Feedback/5
@@ -121,9 +124,58 @@ namespace FacilityManagement.Controllers.FeedbackController
             return CreatedAtAction("GetFeedbacks", "Feedback is deleted");
         }
 
-        //private bool FeedbackExists(int id)
-        //{
-        //    return _service.Feedbacks.Any(e => e.Id == id);
-        //}
+        // PUT: api/Feedback/AcceptFeedback/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("AcceptFeedback/{id}")]
+        public async Task<IActionResult> PutAcceptFeedback(int id)
+        {
+            try
+            {
+                await _service.AcceptFeedback(id);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+
+                throw;
+            }
+
+            return NoContent();
+        }
+
+        // PUT: api/Feedback/DenyFeedback/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("DenyFeedback/{id}")]
+        public async Task<IActionResult> PutDenyFeedback(int id)
+        {
+            try
+            {
+                await _service.DenyFeedback(id);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+
+                throw;
+            }
+
+            return NoContent();
+        }
+
+        // PUT: api/Feedback/CloseFeedback/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("CloseFeedback/{id}")]
+        public async Task<IActionResult> PutCloseFeedback(int id)
+        {
+            try
+            {
+                await _service.CloseFeedback(id);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+
+                throw;
+            }
+
+            return NoContent();
+        }
     }
 }

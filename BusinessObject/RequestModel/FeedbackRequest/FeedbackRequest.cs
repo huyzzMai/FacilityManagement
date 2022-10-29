@@ -9,17 +9,13 @@ namespace BusinessObject.RequestModel.FeedbackRequest
 {
     public class FeedbackRequest
     {
-        [Required]
         public int userId;
 
-        [Required]
         public int deviceId;
 
-        [Required]
         public int roomId;
         public byte[] image;
 
-        [Required]
         public string description;
     }
 }

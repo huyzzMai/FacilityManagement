@@ -10,6 +10,6 @@ namespace BusinessObject.ResponseModel.DeviceResponse
         public int DeviceTypeID { get; set; }
         public int? RoomID { get; set; }
         public string Name { get; set; }
-        public string Status { get; set; }
+        public int? Status { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
@@ -7,6 +8,7 @@ namespace BusinessObject.Models
 {
     public partial class Feedback
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public int? UserId { get; set; }
         public int DeviceId { get; set; }

@@ -14,6 +14,9 @@ namespace DataAccess.IServices
         Task DeleteFeedback(int id);
         Task<IEnumerable<FeedbackResponse>> GetAllFeedback();
         Task<FeedbackResponse> GetFeedbackById(int id);
+        Task DenyFeedback(int id);
+        Task AcceptFeedback(int id);
+        Task CloseFeedback(int id);
     }
 }
 

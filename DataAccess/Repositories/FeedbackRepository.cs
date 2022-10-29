@@ -21,12 +21,12 @@ namespace DataAccess.Repositories
         {
             //try
             //{
-                Feedback _feedback = await GetFeedback(feedback.Id);
-                if (_feedback != null)
-                {
-                    throw new Exception("Create fail: " + "Id existed");
-                }
-                await _facilityFeedbackManagementContext.Feedbacks.AddAsync(feedback);
+            //Feedback _feedback = await GetFeedback(feedback.Id);
+            //if (_feedback != null)
+            //{
+            //    throw new Exception("Create fail: " + "Id existed");
+            //}
+            await _facilityFeedbackManagementContext.Feedbacks.AddAsync(feedback);
                 await _facilityFeedbackManagementContext.SaveChangesAsync();
             //}
             //catch (Exception ex)
