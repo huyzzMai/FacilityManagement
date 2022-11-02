@@ -32,6 +32,10 @@ namespace DataAccess.Services
                     {
                         status = "Active";
                     }
+                    else if (department.Status == CommonEnums.DEPARTMENTSTATUS.BUSY)
+                    {
+                        status = "Busy";
+                    }
                     else
                     {
                         status = "Inactive";
@@ -94,6 +98,7 @@ namespace DataAccess.Services
 
             d.Name = request.DepartmentName;
             d.UpdatedAt = DateTime.Now;
+            d.UpdatedBy = "Admin";
 
             await departmentRepository.SaveDepartment(d);
 
@@ -104,6 +109,49 @@ namespace DataAccess.Services
             };
 
             return upde;
+        }
+
+        public async Task UpdateDepartmentStatus(int id, int request)
+        {
+            Department d = await departmentRepository.GetDepartmentAndDeleteIsFalse(id);
+
+            if (d == null)
+            {
+                throw new Exception("This department is unavailable to update.");
+            }
+
+            if (request == CommonEnums.DEPARTMENTSTATUS.BUSY)
+            {
+                if (d.Status != CommonEnums.DEPARTMENTSTATUS.BUSY) 
+                {
+                    d.Status = CommonEnums.DEPARTMENTSTATUS.BUSY;
+                    d.UpdatedAt = DateTime.Now;
+                    d.UpdatedBy = "Admin";
+                    await departmentRepository.SaveDepartment(d); 
+                }
+                else
+                {
+                    throw new Exception("This department already busy!");
+                }
+            }
+            else if (request == CommonEnums.DEPARTMENTSTATUS.REMOVEBUSY)
+            {
+                if (d.Status == CommonEnums.DEPARTMENTSTATUS.BUSY) 
+                {
+                    d.Status = CommonEnums.DEPARTMENTSTATUS.ACTIVE;
+                    d.UpdatedAt = DateTime.Now;
+                    d.UpdatedBy = "Admin";
+                    await departmentRepository.SaveDepartment(d);
+                }
+                else
+                {
+                    throw new Exception("This department already active!");
+                }
+            }
+            else
+            {
+                throw new Exception("Action can not be executed!");
+            }
         }
 
         public async Task DeleteDepartment(int id)
@@ -118,6 +166,7 @@ namespace DataAccess.Services
             d.IsDeleted = true;
             d.Status = CommonEnums.DEPARTMENTSTATUS.INACTIVE;
             d.UpdatedAt = DateTime.Now;
+            d.UpdatedBy = "Admin";
 
             await departmentRepository.SaveDepartment(d);
         }

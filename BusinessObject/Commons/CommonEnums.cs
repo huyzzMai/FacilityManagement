@@ -18,6 +18,8 @@ namespace BusinessObject.Commons
         {
             public const int ACTIVE = 0;
             public const int INACTIVE = 1;
+            public const int BUSY = 2;
+            public const int REMOVEBUSY = 3;
         }
         public class DEVICETYPETATUS
         {

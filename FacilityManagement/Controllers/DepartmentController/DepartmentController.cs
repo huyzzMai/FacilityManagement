@@ -83,6 +83,31 @@ namespace FacilityManagement.Controllers.DepartmentController
             }
         }
 
+        [HttpPut("updatestatus/{id:int}")]
+        public async Task<IActionResult> ChangeDepartmentStatus(int id, int request)
+        {
+            try
+            {
+                var d = await departmentService.GetDepartmentById(id);
+
+                if (d == null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+                }
+                else
+                {
+                    await departmentService.UpdateDepartmentStatus(id, request);
+                    return Ok("Status updated successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
