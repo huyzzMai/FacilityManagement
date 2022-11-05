@@ -3,6 +3,7 @@ using DataAccess.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -86,6 +87,7 @@ namespace DataAccess.Repositories
                     .Include("Device")
                     .AsNoTracking()
                     .ToListAsync();
+                Debug.WriteLine("Get log List " + _facilityFeedbackManagementContext.Logs.Where(f => f.IsDeleted == false).Count());
             }
             catch (Exception ex)
             {

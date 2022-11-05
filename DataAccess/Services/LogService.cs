@@ -11,17 +11,20 @@ namespace DataAccess.Services
 {
     public class LogService : ILogService
     {
-        private readonly ILogRepository _LogRepository;
+        private readonly ILogRepository logRepository;
+        private readonly IUserRepository userRepository;
 
-        public LogService(ILogRepository LogRepository)
+        public LogService(IUserRepository userRepository, ILogRepository logRepository)
         {
-            _LogRepository = LogRepository;
+            this.userRepository = userRepository;
+            this.logRepository= logRepository;
         }
+
         public async Task CreateLog(Log log)
         {
             try
             {
-                await _LogRepository.Create(log);
+                await logRepository.Create(log);
             }
             catch (Exception ex)
             {
@@ -33,7 +36,7 @@ namespace DataAccess.Services
         {
             try
             {
-                await _LogRepository.Delete(id);
+                await logRepository.Delete(id);
             }
             catch (Exception ex)
             {
@@ -45,9 +48,16 @@ namespace DataAccess.Services
         {
             try
             {
-                IEnumerable<Log> Logs = await _LogRepository.GetList();
+                IEnumerable<Log> Logs = await logRepository.GetList();
+                foreach(Log log in Logs)
+                {
+                    if (log.FixerId != null)
+                    {
+                        log.User = await userRepository.GetUserAndDeleteIsFalse(log.FixerId.GetValueOrDefault());
+                    }
+                }
                 IEnumerable<LogResponse> LogResponses = Logs
-                    .Select(l => new LogResponse() { id = l.Id, feedbackDescription = l.Feedback.Description, status = l.Status.ToString(), logDescription = l.Description, deviceName = l.Device.Name});
+                    .Select(l => Log.MapToResponse(l));
                 return LogResponses;
             }
             catch (Exception ex)
@@ -60,15 +70,8 @@ namespace DataAccess.Services
         {
             try
             {
-                Log log = await _LogRepository.GetLog(id);
-                return new LogResponse()
-                {
-                    id = log.Id,
-                    feedbackDescription = log.Feedback.Description,
-                    deviceName = log.Device.Name,
-                    logDescription = log.Description,
-                    status = log.Status.ToString(),
-                };
+                Log log = await logRepository.GetLog(id);
+                return Log.MapToResponse(log);
             }
             catch (Exception ex)
             {
@@ -80,9 +83,9 @@ namespace DataAccess.Services
         {
             try
             {
-                Log _log = await _LogRepository.GetLog(id);
+                Log _log = await logRepository.GetLog(id);
 
-                await _LogRepository.Update(log);
+                await logRepository.Update(log);
             }
             catch (Exception ex)
             {

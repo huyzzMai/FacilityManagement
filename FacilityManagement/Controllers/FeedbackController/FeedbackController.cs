@@ -41,6 +41,15 @@ namespace FacilityManagement.Controllers.FeedbackController
             return feedbacks;
         }
 
+        // GET: api/Feedback/Pending
+        [HttpGet("Pending")]
+        public async Task<IEnumerable<FeedbackResponse>> GetFeedbacksOnPending()
+        {
+            var feedbacks = await _service.GetAllFeedbackOnPending();
+
+            return feedbacks;
+        }
+
         // GET: api/Feedback/5
         [HttpGet("{id}")]
         public async Task<ActionResult<FeedbackResponse>> GetFeedback(int id)
