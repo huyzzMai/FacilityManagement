@@ -1,6 +1,6 @@
 ﻿using BusinessObject.Models;
 using BusinessObject.RequestModel.AuthenticationRequest;
-using BusinessObject.RequestModel.UserReqest;
+using BusinessObject.RequestModel.UserRequest;
 using BusinessObject.ResponseModel.AuthenticationResponse;
 using BusinessObject.ResponseModel.UserResponse;
 using System;
@@ -19,7 +19,9 @@ namespace DataAccess.IServices
         Task<User> GetUserById(int id);
         Task<User> GetUserByEmail(string email);
         Task<User> CreateUserByGoogleLogin(GoogleUserCreateRequest request);
+        Task <EmployeeCreateResponse> CreateEmployee(EmployeeCreateRequest request);  
         Task<UserResponse> UpdateUser(int id, UserRequest model);
+        Task UpdateUserStatus(int id, int request);
         Task DeleteUser(int id);
 
     }

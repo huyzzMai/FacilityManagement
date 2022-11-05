@@ -14,7 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using BusinessObject.Commons;
 using BusinessObject.ResponseModel.UserResponse;
-using BusinessObject.RequestModel.UserReqest;
+using BusinessObject.RequestModel.UserRequest;
 
 namespace DataAccess.Services
 {
@@ -29,6 +29,23 @@ namespace DataAccess.Services
             this.userRepository = userRepository;
             _configuration = configuration;
         }
+
+        #region CreateToken
+        public LoginResponse CreateToken(Claim[] claims)
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+
+            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], claims, expires: DateTime.UtcNow.AddDays(1), signingCredentials: signIn);
+
+            var result = new LoginResponse()
+            {
+                Token = token
+            };
+            return result;
+        }
+        #endregion
 
         public async Task<LoginResponse> LoginUser(LoginRequest request)
         {
@@ -46,17 +63,20 @@ namespace DataAccess.Services
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                     new Claim("Id", userId)
                     };
-
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-
-                    var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-                    var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], claims, expires: DateTime.UtcNow.AddDays(1), signingCredentials: signIn);
-
-                    var result = new LoginResponse()
+                    var result = CreateToken(claims);
+                    return result;
+                } 
+                else if (user.Role == CommonEnums.ROLE.FIXER)
+                {
+                var claims = new[]
                     {
-                        Token = token
+                    new Claim(ClaimTypes.Role, "Fixer"),
+                    new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    new Claim("Id", userId)
                     };
+                    var result = CreateToken(claims);
                     return result;
                 }
                 else
@@ -68,18 +88,8 @@ namespace DataAccess.Services
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                     new Claim("Id", userId)
-                    };
-
-                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-
-                    var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-                    var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], claims, expires: DateTime.UtcNow.AddDays(1), signingCredentials: signIn);
-
-                    var result = new LoginResponse()
-                    {
-                        Token = token
-                    };
+                    }; 
+                    var result = CreateToken(claims);
                     return result;
                 }
         }
@@ -96,17 +106,7 @@ namespace DataAccess.Services
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                     new Claim("Id", userId)
                     };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-
-            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], claims, expires: DateTime.UtcNow.AddDays(1), signingCredentials: signIn);
-
-            var result = new LoginResponse()
-            {
-                Token = token
-            };
+            var result = CreateToken(claims);
             return result;
         }
 
@@ -122,10 +122,15 @@ namespace DataAccess.Services
                     {
                         role = "Admin";
                     }
+                    else if (user.Role == CommonEnums.ROLE.FIXER)
+                    {
+                        role = "Fixer";
+                    }
                     else
                     {
-                        role = "Student";
+                        role = "User";
                     }
+
                     if (user.Status == CommonEnums.USERSTATUS.ACTIVE)
                     {
                         status = "Active";
@@ -178,6 +183,56 @@ namespace DataAccess.Services
             return u;
         }
 
+        public async Task<EmployeeCreateResponse> CreateEmployee(EmployeeCreateRequest request)
+        {
+            var u = await userRepository.GetUerByEmailAndDeleteIsFalse(request.Email);
+
+            if (u != null)
+            {
+                throw new Exception("This user cannot be updated!");
+            }
+            if (request.Role != CommonEnums.ROLE.FIXER || request.Role != CommonEnums.ROLE.ADMIN)
+            {
+                throw new Exception("Invalid role!");
+            }
+
+            string RandomString(int size, bool lowerCase = false)
+            {
+                var builder = new StringBuilder(size);
+
+                Random _random = new Random();
+
+                char offset = lowerCase ? 'a' : 'A';
+                const int lettersOffset = 26; // A...Z or a..z: length=26  
+
+                for (var i = 0; i < size; i++)
+                {
+                    var @char = (char)_random.Next(offset, offset + lettersOffset);
+                    builder.Append(@char);
+                }
+                return lowerCase ? builder.ToString().ToLower() : builder.ToString();
+            }
+            var sb = new StringBuilder();
+            sb.Append(RandomString(8, true));
+            string pw = sb.ToString();
+
+            User user = new User()
+            {
+                Email = request.Email,
+                Password = pw,
+                Role = request.Role,
+            };
+
+            await userRepository.SaveCreateUser(user);  
+
+            var rs = new EmployeeCreateResponse
+            {
+                Email = user.Email,
+                Password = user.Password,
+            };
+            return rs;
+        }
+
         public async Task<UserResponse> UpdateUser(int id, UserRequest model)
         {
             var u = await userRepository.GetUserAndDeleteIsFalse(id);
@@ -203,6 +258,48 @@ namespace DataAccess.Services
             };
 
             return upuser;
+        }
+
+        public async Task UpdateUserStatus(int id, int request)
+        {
+            User u = await userRepository.GetUserAndDeleteIsFalse(id);
+            if(u == null)
+            {
+                throw new Exception("This user is unavailable to update.");
+            }
+
+            if (request == CommonEnums.USERSTATUS.BAN)
+            {
+                if (u.Status != CommonEnums.USERSTATUS.BAN) 
+                {
+                    u.Status = CommonEnums.USERSTATUS.BAN;
+                    u.UpdatedAt = DateTime.Now;
+                    u.UpdatedBy = "Admin";
+                    await userRepository.SaveUser(u);
+                }
+                else
+                {
+                    throw new Exception("This user already ban!");
+                }
+            }
+            else if (request == CommonEnums.USERSTATUS.REMOVEBAN)
+            {
+                if (u.Status == CommonEnums.USERSTATUS.BAN)
+                {
+                    u.Status = CommonEnums.USERSTATUS.ACTIVE;
+                    u.UpdatedAt = DateTime.Now;
+                    u.UpdatedBy = "Admin";
+                    await userRepository.SaveUser(u);
+                }
+                else
+                {
+                    throw new Exception("This user already active!");
+                }
+            }
+            else
+            {
+                throw new Exception("Action can not be executed!");
+            }
         }
 
         public async Task DeleteUser(int id)

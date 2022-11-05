@@ -1,4 +1,4 @@
-﻿using BusinessObject.RequestModel.UserReqest;
+﻿using BusinessObject.RequestModel.UserRequest;
 using DataAccess.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,10 +11,10 @@ namespace FacilityManagement.Controllers.UserController
     [Route("api/user")]
     [ApiController]
     [Authorize(Roles = "Admin")]
-    public class UserController : ControllerBase
+    public class UserManagementController : ControllerBase
     {
         private readonly IUserService userService;
-        public UserController(IUserService userService)
+        public UserManagementController(IUserService userService)
         {
             this.userService = userService;
         }
@@ -27,6 +27,21 @@ namespace FacilityManagement.Controllers.UserController
                 return Ok(await userService.GetAllUsers());
             }
             catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddEmployee([FromBody] EmployeeCreateRequest model)
+        {
+            try
+            {
+                return StatusCode(StatusCodes.Status201Created,
+                    await userService.CreateEmployee(model));
+            }
+            catch(Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ex.Message);
@@ -57,8 +72,23 @@ namespace FacilityManagement.Controllers.UserController
             }
         }
 
+        [HttpPut("updatestatus/{id:int}")]
+        public async Task<IActionResult> ChangeUserStatus(int id, int request)
+        {
+            try
+            {
+                await userService.UpdateUserStatus(id, request);
+                return Ok("Status updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteUserAsync(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
             try
             {

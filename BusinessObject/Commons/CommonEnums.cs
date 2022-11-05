@@ -12,6 +12,7 @@ namespace BusinessObject.Commons
         {
             public const int ADMIN = 1;
             public const int USER = 2;
+            public const int FIXER = 3;
         }
 
         public class DEPARTMENTSTATUS
@@ -34,7 +35,9 @@ namespace BusinessObject.Commons
         public class USERSTATUS
         {
             public const int ACTIVE = 0;
-            public const int INACTIVE = 1;  
+            public const int INACTIVE = 1;
+            public const int BAN = 2;
+            public const int REMOVEBAN = 3;
         }
 
         public class ROOMSTATUS

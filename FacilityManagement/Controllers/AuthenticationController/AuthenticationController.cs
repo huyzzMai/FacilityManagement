@@ -1,6 +1,6 @@
 ﻿using BusinessObject.Models;
 using BusinessObject.RequestModel.AuthenticationRequest;
-using BusinessObject.RequestModel.UserReqest;
+using BusinessObject.RequestModel.UserRequest;
 using DataAccess.IServices;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;

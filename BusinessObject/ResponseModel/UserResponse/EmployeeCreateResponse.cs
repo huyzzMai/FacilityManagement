@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject.RequestModel.UserReqest
+namespace BusinessObject.ResponseModel.UserResponse
 {
-    public class UserRequest
+    public class EmployeeCreateResponse
     {
-        public string FullName { get; set; }
         public string Email { get; set; }
-        public string Image { get; set; }
+        public string Password { get; set; }
     }
 }

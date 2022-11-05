@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject.RequestModel.UserReqest
+namespace BusinessObject.RequestModel.UserRequest
 {
-    public class GoogleUserCreateRequest
+    public class UserRequest
     {
         public string FullName { get; set; }
         public string Email { get; set; }
-        public string Img { get; set; }
+        public string Image { get; set; }
     }
 }
