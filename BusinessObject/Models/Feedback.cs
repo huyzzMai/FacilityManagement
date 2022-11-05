@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BusinessObject.Commons;
+using BusinessObject.ResponseModel.FeedbackResponse;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -26,5 +28,41 @@ namespace BusinessObject.Models
         public virtual Device Device { get; set; }
         public virtual Room Room { get; set; }
         public virtual User User { get; set; }
+
+        static public FeedbackResponse MapToResponse(Feedback feedback)
+        {
+            FeedbackResponse feedbackResponse = new()
+            {
+                id = feedback.Id,
+                userName = feedback.User.FullName,
+                roomName = feedback.Room.Name,
+                deviceName = feedback.Device.Name,
+                description = feedback.Description,
+            };
+            string status;
+
+            switch (feedback.Status.GetValueOrDefault())
+            {
+                case CommonEnums.FEEDBACKSTATUS.CLOSE:
+                    status = "CLOSE";
+                    break;
+                case CommonEnums.FEEDBACKSTATUS.PENDING:
+                    status = "PENDING";
+                    break;
+                case CommonEnums.FEEDBACKSTATUS.DENY:
+                    status = "DENY";
+                    break;
+                case CommonEnums.FEEDBACKSTATUS.ACCEPT:
+                    status = "ACCEPT";
+                    break;
+                default:
+                    status = "UNDIFINED";
+                    break;
+            }
+
+            feedbackResponse.status = status;
+
+            return feedbackResponse;
+        }
     }
 }

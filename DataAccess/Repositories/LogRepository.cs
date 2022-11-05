@@ -60,7 +60,12 @@ namespace DataAccess.Repositories
             Log log = null;
             try
             {
-                log = await _facilityFeedbackManagementContext.Logs.Where(f => f.IsDeleted == false && f.Id.Equals(id)).FirstOrDefaultAsync();
+                log = await _facilityFeedbackManagementContext.Logs
+                    .Where(f => f.IsDeleted == false && f.Id.Equals(id))
+                    .Include(l => l.Device)
+                    .Include(l => l.Feedback)
+                    .Include(l => l.User)
+                    .FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -77,7 +82,10 @@ namespace DataAccess.Repositories
             {
                 logs = await _facilityFeedbackManagementContext.Logs
                     .Where(f => f.IsDeleted == false)
-                    .Include("Feedback").Include("Device").AsNoTracking().ToListAsync();
+                    .Include("Feedback")
+                    .Include("Device")
+                    .AsNoTracking()
+                    .ToListAsync();
             }
             catch (Exception ex)
             {

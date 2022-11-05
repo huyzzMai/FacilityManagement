@@ -29,31 +29,15 @@ namespace FacilityManagement.Controllers.FeedbackController
         {
             IEnumerable<FeedbackResponse> feedbacks = await _service.GetAllFeedback();
 
-            feedbacks = feedbacks.Select(r =>
-            {
-                string status;
+            return feedbacks;
+        }
 
-                switch (Int32.Parse(r.status))
-                {
-                    case CommonEnums.FEEDBACKSTATUS.CLOSE:
-                        status = "CLOSE";
-                        break;
-                    case CommonEnums.FEEDBACKSTATUS.PENDING:
-                        status = "PENDING";
-                        break;
-                    case CommonEnums.FEEDBACKSTATUS.DENY:
-                        status = "DENY";
-                        break;
-                    case CommonEnums.FEEDBACKSTATUS.ACCEPT:
-                        status = "ACCEPT";
-                        break;
-                    default:
-                        status = "UNDIFINED";
-                        break;
-                }
-                r.status = status;
-                return r;
-            }).ToList();
+        // GET: api/Feedback/Feedbacks/5
+        [HttpGet("User/{id}")]
+        public async Task<IEnumerable<FeedbackResponse>> GetFeedbacksByUserId(int id)
+        {
+            var feedbacks = await _service.GetAllFeedbackByUserId(id);
+
             return feedbacks;
         }
 
@@ -82,7 +66,6 @@ namespace FacilityManagement.Controllers.FeedbackController
             }
             catch (DbUpdateConcurrencyException)
             {
-                
                     throw;
             }
 
@@ -127,11 +110,11 @@ namespace FacilityManagement.Controllers.FeedbackController
         // PUT: api/Feedback/AcceptFeedback/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("AcceptFeedback/{id}")]
-        public async Task<IActionResult> PutAcceptFeedback(int id)
+        public async Task<IActionResult> PutAcceptFeedback(int id, int fixerId)
         {
             try
             {
-                await _service.AcceptFeedback(id);
+                await _service.AcceptFeedback(id, fixerId);
             }
             catch (DbUpdateConcurrencyException)
             {

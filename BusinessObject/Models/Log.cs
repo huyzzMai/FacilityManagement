@@ -11,6 +11,7 @@ namespace BusinessObject.Models
         public int Id { get; set; }
         public int FeedbackId { get; set; }
         public int DeviceId { get; set; }
+        public int FixerId { get; set; }
         public int? Status { get; set; }
         public string Description { get; set; }
         public bool? IsDeleted { get; set; }
@@ -21,5 +22,6 @@ namespace BusinessObject.Models
 
         public virtual Device Device { get; set; }
         public virtual Feedback Feedback { get; set; }
+        public virtual User User { get; set; }
     }
 }

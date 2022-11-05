@@ -113,7 +113,7 @@ namespace DataAccess.Services
             {
                 IEnumerable<Feedback> feedbacks = await _feedbackRepository.GetList();
                 IEnumerable <FeedbackResponse> FeedbackResponses = feedbacks
-                    .Select(f => new FeedbackResponse() { id = f.Id, userName = f.User.FullName, roomName = f.Room.Name, deviceName = f.Device.Name, description = f.Description, status = f.Status.ToString() });
+                    .Select(f => Feedback.MapToResponse(f));
                 return FeedbackResponses;
             }
             catch (Exception ex)
@@ -181,7 +181,7 @@ namespace DataAccess.Services
             }
         }
 
-        public async Task AcceptFeedback(int id)
+        public async Task AcceptFeedback(int id, int fixerId)
         {
             try
             {
@@ -243,6 +243,12 @@ namespace DataAccess.Services
             {
                 throw new Exception(e.Message);
             }
+        }
+
+        public async Task<IEnumerable<FeedbackResponse>> GetAllFeedbackByUserId(int userId)
+        {
+            var feedbacks = await _feedbackRepository.GetList();
+            return feedbacks.Where(f => f.UserId.GetValueOrDefault().Equals(userId)).Select(f=>Feedback.MapToResponse(f));
         }
     }
 }
