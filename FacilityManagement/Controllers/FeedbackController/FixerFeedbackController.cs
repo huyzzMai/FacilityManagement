@@ -19,7 +19,7 @@ namespace FacilityManagement.Controllers.FeedbackController
             this.feedbackService = feedbackService; 
         }
 
-        [HttpGet("user/{id:int}")]
+        [HttpGet("user/{userId:int}")]
         public async Task<IActionResult> GetFeedbackListByFixerId(int userId)
         {
             try
@@ -33,7 +33,7 @@ namespace FacilityManagement.Controllers.FeedbackController
             }
         }
 
-        [HttpGet("feedback/{id:int}")]
+        [HttpGet("feedback/{feedbackId:int}")]
         public async Task<IActionResult> GetfeedbackById(int feedbackId)
         {
             try
@@ -47,12 +47,13 @@ namespace FacilityManagement.Controllers.FeedbackController
             }
         }
 
-        [HttpPut]
-        public async Task<IActionResult> ProcessFeedback()
+        [HttpPut("feedback/{feedbackId:int}/fixer/{fixerId:int}")]
+        public async Task<IActionResult> ProcessFeedback(int fixerId, int feedbackId, string message)
         {
             try
             {
-                return null;
+                await feedbackService.ProcessFeedback(fixerId, feedbackId, message);
+                return Ok("Process completed successfully");
             }
             catch (Exception ex)
             {

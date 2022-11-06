@@ -26,7 +26,8 @@ namespace DataAccess.Repositories
 
         public async Task<User> GetUserAndDeleteIsFalse(int id)
         {
-            User us = await dbContext.Users.Where(u => u.Id.Equals(id) && u.IsDeleted == false)
+            User us = await dbContext.Users.Where(u => u.Id.Equals(id) && u.IsDeleted == false) 
+                .Include("Department")
                 .FirstOrDefaultAsync();
             return us;
         }

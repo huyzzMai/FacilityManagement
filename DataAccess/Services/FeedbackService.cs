@@ -305,10 +305,21 @@ namespace DataAccess.Services
             {
                 throw new Exception("Fixer not found");                        
             }
+            if (fixer.Department.Status == CommonEnums.DEPARTMENTSTATUS.BUSY)
+            {
+                throw new Exception("Department busy!");
+            }
 
             Log newLog = new()
             {
-
+                FeedbackId = fb.Id,
+                DeviceId = fb.DeviceId,
+                FixerId = log.FixerId,
+                Status = CommonEnums.LOGSTATUS.FEEDBACK_CLOSE,
+                Description = message,
+                IsDeleted = false,
+                CreatedAt = DateTime.Now,
+                CreatedBy = "system",
             };
 
             fb.Status = CommonEnums.FEEDBACKSTATUS.DONE;
@@ -316,6 +327,7 @@ namespace DataAccess.Services
             fb.UpdatedBy = "Fixer";
 
             await _feedbackRepository.Update(fb);
+            await _logRepository.Create(newLog);
         }
     }
 }
