@@ -1,4 +1,5 @@
 ﻿using BusinessObject.RequestModel.UserRequest;
+using BusinessObject.ResponseModel.UserResponse;
 using DataAccess.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -10,13 +11,35 @@ namespace FacilityManagement.Controllers.UserController
 {
     [Route("api/personaluser")]
     [ApiController]
-    [Authorize(Roles = "Admin, User, Fixer")]
+    //[Authorize(Roles = "Admin, User, Fixer")]
     public class PersonalUserController : ControllerBase
     {
         private readonly IUserService userService;
         public PersonalUserController(IUserService userService)
         {
             this.userService = userService;
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetUserInformation(int id)
+        {
+            try
+            {
+                var u = await userService.GetUserById(id);
+                var user = new UserInformationRespsonse
+                {
+                    Email = u.Email,
+                    FullName = u.FullName,
+                    Image = u.Image,
+                };
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
         }
 
         [HttpPut("{id:int}")]
