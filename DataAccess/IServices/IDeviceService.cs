@@ -14,5 +14,7 @@ namespace DataAccess.IServices
         Task<DeviceResponse> UpdateDevice(int id, DeviceRequest devices);
         Task<DeviceResponse> CreateDevice(DeviceRequest devices);
         Task DeleteDevice(int id);
+        Task AddFixingStatus(int id);
+        Task AddFixedStatus(int id);
     }
 }

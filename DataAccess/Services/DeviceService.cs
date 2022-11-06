@@ -131,5 +131,47 @@ namespace DataAccess.Services
             }
 
         }
+
+        public async Task AddFixingStatus(int id)
+        {
+            Device r = await deviceRepository.GetDeviceAndDeleteIsFalse(id);
+            if (r == null)
+            {
+                throw new Exception("This device is fixing .");
+            }
+
+            if (r.Status != CommonEnums.DEVICESTATUS.FIXING)
+            {
+                r.Status = CommonEnums.DEVICESTATUS.FIXING;
+                r.UpdatedAt = DateTime.Now;
+                r.UpdatedBy = "Admin";
+                await deviceRepository.SaveDevice(r);
+            }
+            else
+            {
+                throw new Exception("This device is fixing !");
+            }
+        }
+
+        public async Task AddFixedStatus(int id)
+        {
+            Device r = await deviceRepository.GetDeviceAndDeleteIsFalse(id);
+            if (r == null)
+            {
+                throw new Exception("This device is fixed .");
+            }
+
+            if (r.Status != CommonEnums.DEVICESTATUS.FIXED)
+            {
+                r.Status = CommonEnums.DEVICESTATUS.FIXED;
+                r.UpdatedAt = DateTime.Now;
+                r.UpdatedBy = "Admin";
+                await deviceRepository.SaveDevice(r);
+            }
+            else
+            {
+                throw new Exception("This device is fixed !");
+            }
+        }
     }
 }

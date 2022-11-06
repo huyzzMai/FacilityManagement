@@ -136,5 +136,47 @@ namespace DataAccess.Services
 
             await roomRepository.UpdateRoom(r);
         }
+
+        public async Task AddFixingStatus(int id)
+        {
+            Room r = await roomRepository.GetRoomAndDeleteIsFalse(id);
+            if (r == null)
+            {
+                throw new Exception("This room is fixing.");
+            }
+
+            if (r.Status != CommonEnums.ROOMSTATUS.FIXING)
+            {
+                r.Status = CommonEnums.ROOMSTATUS.FIXING;
+                r.UpdatedAt = DateTime.Now;
+                r.UpdatedBy = "Admin";
+                await roomRepository.SaveRoom(r);
+            }
+            else
+            {
+                throw new Exception("This room is fixing !");
+            }
+        }
+
+        public async Task AddFixedStatus(int id)
+        {
+            Room r = await roomRepository.GetRoomAndDeleteIsFalse(id);
+            if (r == null)
+            {
+                throw new Exception("This room is already fixed.");
+            }
+
+            if (r.Status != CommonEnums.ROOMSTATUS.FIXED)
+            {
+                r.Status = CommonEnums.ROOMSTATUS.FIXED;
+                r.UpdatedAt = DateTime.Now;
+                r.UpdatedBy = "Admin";
+                await roomRepository.SaveRoom(r);
+            }
+            else
+            {
+                throw new Exception("This room is already fixed!");
+            }
+        }
     }
 }

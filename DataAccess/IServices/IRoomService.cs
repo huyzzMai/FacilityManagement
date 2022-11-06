@@ -17,5 +17,7 @@ namespace DataAccess.IServices
         Task<RoomResponse> UpdateRoom(int id, RoomRequest rooms);
         Task<RoomResponse> CreateRoom(RoomRequest rooms);
         Task DeleteRoom(int id);
+        Task AddFixingStatus(int id);
+        Task AddFixedStatus(int id);
     }
 }

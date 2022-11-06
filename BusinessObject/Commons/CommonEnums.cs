@@ -31,6 +31,8 @@ namespace BusinessObject.Commons
         {
             public const int ACTIVE = 0;
             public const int INACTIVE = 1;
+            public const int FIXING = 2;
+            public const int FIXED = 3;
         }
         public class USERSTATUS
         {
@@ -44,6 +46,8 @@ namespace BusinessObject.Commons
         {
             public const int ACTIVE = 0;
             public const int INACTIVE = 1;
+            public const int FIXING = 2;
+            public const int FIXED = 3;
         }
 
         public class FEEDBACKSTATUS
