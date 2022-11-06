@@ -1,4 +1,5 @@
-﻿using BusinessObject.Models;
+﻿using BusinessObject.Commons;
+using BusinessObject.Models;
 using DataAccess.IRepositories;
 using DataAccess.IServices;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ namespace DataAccess.Repositories
 
         public async Task<List<Device>> GetAllDevice()
         {
-            List<Device> devices = await dbContext.Devices.ToListAsync();
+            List<Device> devices = await dbContext.Devices.Where(r => r.IsDeleted == false).ToListAsync();
             return devices;
         }
         public async Task<Device> GetDeviceByName(string name)

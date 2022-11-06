@@ -194,6 +194,7 @@ namespace BusinessObject.Models
                 entity.Property(e => e.DeviceId).HasColumnName("DeviceID");
 
                 entity.Property(e => e.FeedbackId).HasColumnName("FeedbackID");
+                entity.Property(e => e.FixerId).HasColumnName("FixerID");
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
 
@@ -212,6 +213,12 @@ namespace BusinessObject.Models
                     .HasForeignKey(d => d.FeedbackId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Log_Feedback");
+
+                entity.HasOne(d => d.User)
+                    .WithMany()
+                    .HasForeignKey(d => d.FixerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Log_User");
             });
 
             modelBuilder.Entity<Room>(entity =>

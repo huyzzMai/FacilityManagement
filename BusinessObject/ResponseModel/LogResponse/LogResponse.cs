@@ -11,6 +11,7 @@ namespace BusinessObject.ResponseModel.LogResponse
         public int id;
         public string feedbackDescription;
         public string deviceName;
+        public string fixerName;
         public string status;
         public string logDescription;
     }

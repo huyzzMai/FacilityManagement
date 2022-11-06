@@ -15,8 +15,10 @@ namespace DataAccess.IServices
         Task<IEnumerable<FeedbackResponse>> GetAllFeedback();
         Task<FeedbackResponse> GetFeedbackById(int id);
         Task DenyFeedback(int id);
-        Task AcceptFeedback(int id);
+        Task AcceptFeedback(int id, int fixerId);
         Task CloseFeedback(int id);
+        Task<IEnumerable<FeedbackResponse>> GetAllFeedbackByUserId(int userId);
+        Task<IEnumerable<FeedbackResponse>> GetAllFeedbackOnPending();
     }
 }
 

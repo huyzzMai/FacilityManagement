@@ -16,12 +16,14 @@ namespace DataAccess.Services
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly ILogRepository _logRepository;
         private readonly IDeviceRepository _deviceRepository;
+        private readonly IUserRepository _userRepository;
 
-        public FeedbackService(IFeedbackRepository feedbackRepository, ILogRepository logRepository, IDeviceRepository deviceRepository)
+        public FeedbackService(IFeedbackRepository feedbackRepository, ILogRepository logRepository, IDeviceRepository deviceRepository, IUserRepository userRepository)
         {
             _feedbackRepository = feedbackRepository;
             _logRepository = logRepository;
             _deviceRepository = deviceRepository;
+            _userRepository = userRepository;
         }
 
         async Task IFeedbackService.UpdateFeedback(int id, FeedbackUpdateRequest feedbackRequest)
@@ -113,7 +115,7 @@ namespace DataAccess.Services
             {
                 IEnumerable<Feedback> feedbacks = await _feedbackRepository.GetList();
                 IEnumerable <FeedbackResponse> FeedbackResponses = feedbacks
-                    .Select(f => new FeedbackResponse() { id = f.Id, userName = f.User.FullName, roomName = f.Room.Name, deviceName = f.Device.Name, description = f.Description, status = f.Status.ToString() });
+                    .Select(f => Feedback.MapToResponse(f));
                 return FeedbackResponses;
             }
             catch (Exception ex)
@@ -159,7 +161,14 @@ namespace DataAccess.Services
             try
             {
                 var feedback = await _feedbackRepository.GetFeedback(id);
-                feedback.Status = CommonEnums.FEEDBACKSTATUS.DENY;
+                if (feedback.Status == CommonEnums.FEEDBACKSTATUS.PENDING)
+                {
+                    feedback.Status = CommonEnums.FEEDBACKSTATUS.DENY;
+                }
+                else
+                {
+                    throw new Exception("Feedback not on Pending status !!!");
+                }
                 await _feedbackRepository.Update(feedback);
 
                 //create log
@@ -181,12 +190,24 @@ namespace DataAccess.Services
             }
         }
 
-        public async Task AcceptFeedback(int id)
+        public async Task AcceptFeedback(int id, int fixerId)
         {
             try
             {
+                var fixer = await _userRepository.GetUserAndDeleteIsFalse(fixerId);
+                if (fixer.Role.GetValueOrDefault() != CommonEnums.ROLE.FIXER)
+                {
+                    throw new Exception("User not a fixer !!!");
+                }
                 var feedback = await _feedbackRepository.GetFeedback(id);
-                feedback.Status = CommonEnums.FEEDBACKSTATUS.ACCEPT;
+                if(feedback.Status == CommonEnums.FEEDBACKSTATUS.PENDING)
+                {
+                    feedback.Status = CommonEnums.FEEDBACKSTATUS.ACCEPT;
+                } else
+                {
+                    throw new Exception("Feedback not on Pending status !!!");
+                }
+
                 await _feedbackRepository.Update(feedback);
 
                 //update device status
@@ -199,6 +220,7 @@ namespace DataAccess.Services
                 {
                     FeedbackId = feedback.Id,
                     DeviceId = feedback.DeviceId,
+                    FixerId = fixerId,
                     Status = CommonEnums.LOGSTATUS.FEEDBACK_ACCEPT,
                     Description = feedback.Description,
                     IsDeleted = false,
@@ -206,19 +228,26 @@ namespace DataAccess.Services
                     CreatedBy = "system",
                 };
                 await _logRepository.Create(log);
-        }
+            }   
             catch (Exception e)
             {
                 throw new Exception(e.Message);
-    }
-}
+            }
+        }
 
         public async Task CloseFeedback(int id)
         {
             try
             {
                 var feedback = await _feedbackRepository.GetFeedback(id);
-                feedback.Status = CommonEnums.FEEDBACKSTATUS.CLOSE;
+                if (feedback.Status == CommonEnums.FEEDBACKSTATUS.PENDING)
+                {
+                    feedback.Status = CommonEnums.FEEDBACKSTATUS.CLOSE;
+                }
+                else
+                {
+                    throw new Exception("Feedback not on Pending status !!!");
+                }
                 await _feedbackRepository.Update(feedback);
 
                 //update device status
@@ -243,6 +272,18 @@ namespace DataAccess.Services
             {
                 throw new Exception(e.Message);
             }
+        }
+
+        public async Task<IEnumerable<FeedbackResponse>> GetAllFeedbackByUserId(int userId)
+        {
+            var feedbacks = await _feedbackRepository.GetList();
+            return feedbacks.Where(f => f.UserId.GetValueOrDefault().Equals(userId)).Select(f=>Feedback.MapToResponse(f));
+        }
+
+        public async Task<IEnumerable<FeedbackResponse>> GetAllFeedbackOnPending()
+        {
+            var feedbacks = await _feedbackRepository.GetList();
+            return feedbacks.Where(f => f.Status==CommonEnums.FEEDBACKSTATUS.PENDING).Select(f => Feedback.MapToResponse(f));
         }
     }
 }
