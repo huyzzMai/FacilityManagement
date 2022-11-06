@@ -1,4 +1,5 @@
-﻿using BusinessObject.Models;
+﻿using BusinessObject.Commons;
+using BusinessObject.Models;
 using DataAccess.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -95,6 +96,12 @@ namespace DataAccess.Repositories
             }
 
             return logs;
+        }
+
+        public async Task<Log> GetLogByFeedbackIdAndLogStatusIsAccept(int id)
+        {
+            Log log = await _facilityFeedbackManagementContext.Logs.SingleOrDefaultAsync(l => l.FeedbackId == id && l.Status==CommonEnums.LOGSTATUS.FEEDBACK_ACCEPT);
+            return log;
         }
 
         public async Task Update(Log _log)

@@ -52,6 +52,7 @@ namespace BusinessObject.Commons
             public const int CLOSE = 2;
             public const int DENY = 3;
             public const int ACCEPT = 4;
+            public const int DONE = 5;
         }
 
         public class LOGSTATUS

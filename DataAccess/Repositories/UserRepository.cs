@@ -37,7 +37,7 @@ namespace DataAccess.Repositories
             return user;    
         }
 
-        public async Task<User> GetUerByEmailAndDeleteIsFalse(string email)
+        public async Task<User> GetUserByEmailAndDeleteIsFalse(string email)
         {
             User user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.IsDeleted == false);
             return user;

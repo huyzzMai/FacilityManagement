@@ -162,7 +162,7 @@ namespace DataAccess.Services
 
         public async Task<User> GetUserByEmail(string email)
         {
-            User u = await userRepository.GetUerByEmailAndDeleteIsFalse(email);
+            User u = await userRepository.GetUserByEmailAndDeleteIsFalse(email);
             return u;
         }
 
@@ -185,7 +185,7 @@ namespace DataAccess.Services
 
         public async Task<EmployeeCreateResponse> CreateEmployee(EmployeeCreateRequest request)
         {
-            var u = await userRepository.GetUerByEmailAndDeleteIsFalse(request.Email);
+            var u = await userRepository.GetUserByEmailAndDeleteIsFalse(request.Email);
 
             if (u != null)
             {

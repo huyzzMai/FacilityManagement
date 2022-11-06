@@ -11,6 +11,7 @@ namespace DataAccess.IRepositories
     {
         public Task Create(Log log);
         public Task<Log> GetLog(int id);
+        public Task<Log> GetLogByFeedbackIdAndLogStatusIsAccept(int id);
         public Task<IEnumerable<Log>> GetList();
         public Task Update(Log log);
         public Task Delete(int id);

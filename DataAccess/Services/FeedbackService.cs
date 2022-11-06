@@ -73,35 +73,35 @@ namespace DataAccess.Services
         {
             //try
             //{
-                Feedback feedback = new()
-                {
-                    UserId = feedbackRequest.userId,
-                    RoomId = feedbackRequest.roomId,
-                    DeviceId = feedbackRequest.deviceId,
-                    Description = feedbackRequest.description,
-                    Image = feedbackRequest.image,
-                    Status = CommonEnums.FEEDBACKSTATUS.PENDING,
-                    IsDeleted = false,
-                    CreatedAt = DateTime.Today,
-                    CreatedBy = feedbackRequest.userId.ToString(),
+            Feedback feedback = new()
+            {
+                UserId = feedbackRequest.userId,
+                RoomId = feedbackRequest.roomId,
+                DeviceId = feedbackRequest.deviceId,
+                Description = feedbackRequest.description,
+                Image = feedbackRequest.image,
+                Status = CommonEnums.FEEDBACKSTATUS.PENDING,
+                IsDeleted = false,
+                CreatedAt = DateTime.Today,
+                CreatedBy = feedbackRequest.userId.ToString(),
 
-                };
-                await _feedbackRepository.Create(feedback);
+            };
+            await _feedbackRepository.Create(feedback);
 
-                //create log
-                Log log = new()
-                {
-                    FeedbackId = feedback.Id,
-                    DeviceId = feedback.DeviceId,
-                    Status = CommonEnums.LOGSTATUS.FEEDBACK_CREATE, 
-                    Description = feedback.Description,
-                    IsDeleted = false,
-                    CreatedAt = DateTime.Now,
-                    CreatedBy = "system",
-                };
-                await _logRepository.Create(log);
+            //create log
+            Log log = new()
+            {
+                FeedbackId = feedback.Id,
+                DeviceId = feedback.DeviceId,
+                Status = CommonEnums.LOGSTATUS.FEEDBACK_CREATE,
+                Description = feedback.Description,
+                IsDeleted = false,
+                CreatedAt = DateTime.Now,
+                CreatedBy = "system",
+            };
+            await _logRepository.Create(log);
 
-                return feedback.Id;
+            return feedback.Id;
             //}
             //catch (Exception ex)
             //{
@@ -114,7 +114,7 @@ namespace DataAccess.Services
             try
             {
                 IEnumerable<Feedback> feedbacks = await _feedbackRepository.GetList();
-                IEnumerable <FeedbackResponse> FeedbackResponses = feedbacks
+                IEnumerable<FeedbackResponse> FeedbackResponses = feedbacks
                     .Select(f => Feedback.MapToResponse(f));
                 return FeedbackResponses;
             }
@@ -133,7 +133,7 @@ namespace DataAccess.Services
                     id = feedback.Id,
                     userName = feedback.User.FullName,
                     roomName = feedback.Room.Name,
-                    deviceName = feedback.Device.Name, 
+                    deviceName = feedback.Device.Name,
                     description = feedback.Description,
                     status = feedback.Status.ToString()
                 };
@@ -200,7 +200,7 @@ namespace DataAccess.Services
                     throw new Exception("User not a fixer !!!");
                 }
                 var feedback = await _feedbackRepository.GetFeedback(id);
-                if(feedback.Status == CommonEnums.FEEDBACKSTATUS.PENDING)
+                if (feedback.Status == CommonEnums.FEEDBACKSTATUS.PENDING)
                 {
                     feedback.Status = CommonEnums.FEEDBACKSTATUS.ACCEPT;
                 } else
@@ -228,7 +228,7 @@ namespace DataAccess.Services
                     CreatedBy = "system",
                 };
                 await _logRepository.Create(log);
-            }   
+            }
             catch (Exception e)
             {
                 throw new Exception(e.Message);
@@ -277,13 +277,45 @@ namespace DataAccess.Services
         public async Task<IEnumerable<FeedbackResponse>> GetAllFeedbackByUserId(int userId)
         {
             var feedbacks = await _feedbackRepository.GetList();
-            return feedbacks.Where(f => f.UserId.GetValueOrDefault().Equals(userId)).Select(f=>Feedback.MapToResponse(f));
+            return feedbacks.Where(f => f.UserId.GetValueOrDefault().Equals(userId)).Select(f => Feedback.MapToResponse(f));
         }
 
         public async Task<IEnumerable<FeedbackResponse>> GetAllFeedbackOnPending()
         {
             var feedbacks = await _feedbackRepository.GetList();
-            return feedbacks.Where(f => f.Status==CommonEnums.FEEDBACKSTATUS.PENDING).Select(f => Feedback.MapToResponse(f));
+            return feedbacks.Where(f => f.Status == CommonEnums.FEEDBACKSTATUS.PENDING).Select(f => Feedback.MapToResponse(f));
+        }
+
+        public async Task ProcessFeedback(int fixerId, int feedbackId, string message)
+        {
+            Feedback fb = await _feedbackRepository.GetFeedback(feedbackId);
+            if (fb == null || fb.Status != CommonEnums.FEEDBACKSTATUS.ACCEPT)
+            {
+                throw new Exception("This feedback is unavailable to process.");
+            }
+
+            Log log = await _logRepository.GetLogByFeedbackIdAndLogStatusIsAccept(feedbackId);
+            if(log == null)
+            {
+                throw new Exception("Feedback's Log cannot be found!");
+            }
+
+            User fixer = await _userRepository.GetUserAndDeleteIsFalse(log.FixerId ?? default(int));
+            if (fixer == null)
+            {
+                throw new Exception("Fixer not found");                        
+            }
+
+            Log newLog = new()
+            {
+
+            };
+
+            fb.Status = CommonEnums.FEEDBACKSTATUS.DONE;
+            fb.UpdatedAt = DateTime.Now;
+            fb.UpdatedBy = "Fixer";
+
+            await _feedbackRepository.Update(fb);
         }
     }
 }

@@ -43,6 +43,7 @@ namespace DataAccess.Services
 
                     return new DepartmentResponse()
                     {
+                       Id = department.Id,
                        DepartmentName = department.Name,
                        Status = status
                     };
@@ -80,6 +81,7 @@ namespace DataAccess.Services
 
             var upde = new DepartmentResponse()
             {
+                Id = d.Id,
                 DepartmentName = d.Name,
                 Status = "Active"
             };
@@ -103,7 +105,8 @@ namespace DataAccess.Services
             await departmentRepository.SaveDepartment(d);
 
             var upde = new DepartmentResponse()
-            {
+            {   
+                Id = d.Id,
                 DepartmentName = d.Name,
                 Status = "Active"
             };
@@ -111,46 +114,45 @@ namespace DataAccess.Services
             return upde;
         }
 
-        public async Task UpdateDepartmentStatus(int id, int request)
+        public async Task AddBusyStatus(int id)
         {
             Department d = await departmentRepository.GetDepartmentAndDeleteIsFalse(id);
-
             if (d == null)
             {
                 throw new Exception("This department is unavailable to update.");
             }
 
-            if (request == CommonEnums.DEPARTMENTSTATUS.BUSY)
+            if (d.Status != CommonEnums.DEPARTMENTSTATUS.BUSY) 
             {
-                if (d.Status != CommonEnums.DEPARTMENTSTATUS.BUSY) 
-                {
-                    d.Status = CommonEnums.DEPARTMENTSTATUS.BUSY;
-                    d.UpdatedAt = DateTime.Now;
-                    d.UpdatedBy = "Admin";
-                    await departmentRepository.SaveDepartment(d); 
-                }
-                else
-                {
-                    throw new Exception("This department already busy!");
-                }
-            }
-            else if (request == CommonEnums.DEPARTMENTSTATUS.REMOVEBUSY)
-            {
-                if (d.Status == CommonEnums.DEPARTMENTSTATUS.BUSY) 
-                {
-                    d.Status = CommonEnums.DEPARTMENTSTATUS.ACTIVE;
-                    d.UpdatedAt = DateTime.Now;
-                    d.UpdatedBy = "Admin";
-                    await departmentRepository.SaveDepartment(d);
-                }
-                else
-                {
-                    throw new Exception("This department already active!");
-                }
+                  d.Status = CommonEnums.DEPARTMENTSTATUS.BUSY;
+                  d.UpdatedAt = DateTime.Now;
+                  d.UpdatedBy = "Admin";
+                  await departmentRepository.SaveDepartment(d); 
             }
             else
             {
-                throw new Exception("Action can not be executed!");
+                throw new Exception("This department already busy!");
+            }
+        }
+
+        public async Task RemoveBusyStatus(int id)
+        {
+            Department d = await departmentRepository.GetDepartmentAndDeleteIsFalse(id);
+            if (d == null)
+            {
+                throw new Exception("This department is unavailable to update.");
+            }
+
+            if (d.Status == CommonEnums.DEPARTMENTSTATUS.BUSY)
+            {
+                d.Status = CommonEnums.DEPARTMENTSTATUS.ACTIVE;
+                d.UpdatedAt = DateTime.Now;
+                d.UpdatedBy = "Admin";
+                await departmentRepository.SaveDepartment(d);
+            }
+            else
+            {
+                throw new Exception("This department already active!");
             }
         }
 
