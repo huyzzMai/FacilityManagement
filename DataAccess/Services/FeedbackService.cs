@@ -322,7 +322,7 @@ namespace DataAccess.Services
                 CreatedBy = "system",
             };
 
-            fb.Status = CommonEnums.FEEDBACKSTATUS.DONE;
+            fb.Status = CommonEnums.FEEDBACKSTATUS.CLOSE;
             fb.UpdatedAt = DateTime.Now;
             fb.UpdatedBy = "Fixer";
 

@@ -49,19 +49,17 @@ namespace BusinessObject.Commons
         public class FEEDBACKSTATUS
         {
             public const int PENDING = 1;
-            public const int CLOSE = 2;
+            public const int CLOSE = 4;
             public const int DENY = 3;
-            public const int ACCEPT = 4;
-            public const int DONE = 5;
+            public const int ACCEPT = 2;
         }
 
         public class LOGSTATUS
         {
             public const int FEEDBACK_CREATE = 1;
-            public const int FEEDBACK_DENY = 2;
-            public const int FEEDBACK_ACCEPT = 3;
+            public const int FEEDBACK_DENY = 3;
+            public const int FEEDBACK_ACCEPT = 2;
             public const int FEEDBACK_CLOSE = 4;
-
         }
     }
 }
