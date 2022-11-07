@@ -145,7 +145,7 @@ namespace DataAccess.Services
                 r.Status = CommonEnums.DEVICESTATUS.FIXING;
                 r.UpdatedAt = DateTime.Now;
                 r.UpdatedBy = "Admin";
-                await deviceRepository.SaveDevice(r);
+                await deviceRepository.UpdateDevice(r);
             }
             else
             {
@@ -166,7 +166,7 @@ namespace DataAccess.Services
                 r.Status = CommonEnums.DEVICESTATUS.FIXED;
                 r.UpdatedAt = DateTime.Now;
                 r.UpdatedBy = "Admin";
-                await deviceRepository.SaveDevice(r);
+                await deviceRepository.UpdateDevice(r);
             }
             else
             {

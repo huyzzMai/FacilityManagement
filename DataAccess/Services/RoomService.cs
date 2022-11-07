@@ -150,7 +150,7 @@ namespace DataAccess.Services
                 r.Status = CommonEnums.ROOMSTATUS.FIXING;
                 r.UpdatedAt = DateTime.Now;
                 r.UpdatedBy = "Admin";
-                await roomRepository.SaveRoom(r);
+                await roomRepository.UpdateRoom(r);
             }
             else
             {
@@ -171,7 +171,7 @@ namespace DataAccess.Services
                 r.Status = CommonEnums.ROOMSTATUS.FIXED;
                 r.UpdatedAt = DateTime.Now;
                 r.UpdatedBy = "Admin";
-                await roomRepository.SaveRoom(r);
+                await roomRepository.UpdateRoom(r);
             }
             else
             {
