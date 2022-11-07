@@ -106,5 +106,34 @@ namespace FacilityManagement.Controllers.DeviceController
                      "Error deleting user!");
             }
         }
+        [HttpPut("status/fixing/{id:int}")]
+        public async Task<IActionResult> UpdateFixingStatus(int id)
+        {
+            try
+            {
+                await deviceService.AddFixingStatus(id);
+                return Ok("Status updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
+        [HttpPut("status/fixed/{id:int}")]
+        public async Task<IActionResult> UpdateFixedStatus(int id)
+        {
+            try
+            {
+                await deviceService.AddFixedStatus(id);
+                return Ok("Status updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
     }
 }

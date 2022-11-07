@@ -21,7 +21,7 @@ namespace FacilityManagement.Controllers.RoomController
         {
             this.roomService = roomService;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetAllRooms()
         {
@@ -65,7 +65,7 @@ namespace FacilityManagement.Controllers.RoomController
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateRoom(int id,[FromBody] RoomRequest rooms)
+        public async Task<IActionResult> UpdateRoom(int id, [FromBody] RoomRequest rooms)
         {
             try
             {
@@ -113,8 +113,38 @@ namespace FacilityManagement.Controllers.RoomController
                 return StatusCode(StatusCodes.Status500InternalServerError,
                      "Error deleting user!");
             }
+
         }
+        [HttpPut("status/fixing/{id:int}")]
+        public async Task<IActionResult> UpdateFixingStatus(int id)
+        {
+            try
+            {
+                await roomService.AddFixingStatus(id);
+                return Ok("Status updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
+        [HttpPut("status/fixed/{id:int}")]
+        public async Task<IActionResult> UpdateFixedStatus(int id)
+        {
+            try
+            {
+                await roomService.AddFixedStatus(id);
+                return Ok("Status updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
 
         }
     }
+}
 
