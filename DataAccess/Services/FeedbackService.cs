@@ -307,7 +307,7 @@ namespace DataAccess.Services
             // Get logs with status Close
             foreach (var l1 in logs.ToList())
             {
-                if (l1.Status == CommonEnums.LOGSTATUS.FEEDBACK_DONE)
+                if (l1.Status == CommonEnums.LOGSTATUS.FEEDBACK_CLOSE)
                 {
                     fbClose.Add(l1);
                 }
@@ -373,7 +373,7 @@ namespace DataAccess.Services
             // Get logs with status Close
             foreach (var l1 in logs.ToList())
             {
-                if (l1.Status == CommonEnums.LOGSTATUS.FEEDBACK_DONE)
+                if (l1.Status == CommonEnums.LOGSTATUS.FEEDBACK_CLOSE)
                 {
                     fbClose.Add(l1);
                 }
@@ -452,14 +452,14 @@ namespace DataAccess.Services
                 FeedbackId = fb.Id,
                 DeviceId = fb.DeviceId,
                 FixerId = log.FixerId,
-                Status = CommonEnums.LOGSTATUS.FEEDBACK_DONE,
+                Status = CommonEnums.LOGSTATUS.FEEDBACK_CLOSE,
                 Description = message,
                 IsDeleted = false,
                 CreatedAt = DateTime.Now,
                 CreatedBy = "system",
             };
 
-            fb.Status = CommonEnums.FEEDBACKSTATUS.DONE;
+            fb.Status = CommonEnums.FEEDBACKSTATUS.CLOSE;
             fb.UpdatedAt = DateTime.Now;
             fb.UpdatedBy = "Fixer";
 
