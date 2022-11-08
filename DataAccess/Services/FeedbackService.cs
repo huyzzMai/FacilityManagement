@@ -325,10 +325,10 @@ namespace DataAccess.Services
                 }
             }
 
-            if(fbAccept.Count == 0)
-            {
-                throw new Exception("Fixer has no Accept feedbacks.");
-            }
+            //if(fbAccept.Count == 0)
+            //{
+            //    throw new Exception("Fixer has no Accept feedbacks.");
+            //}
 
             foreach (var log in fbAccept.ToList())
             {
@@ -379,10 +379,10 @@ namespace DataAccess.Services
                 }
             }
 
-            if(fbClose.Count == 0)
-            {
-                throw new Exception("Fixer has no Close feedbacks.");
-            }
+            //if(fbClose.Count == 0)
+            //{
+            //    throw new Exception("Fixer has no Close feedbacks.");
+            //}
 
             foreach (var log in fbClose.ToList())
             {
@@ -445,7 +445,7 @@ namespace DataAccess.Services
             //update device status
             var device = await _deviceRepository.GetDeviceAndDeleteIsFalse(fb.DeviceId);
             device.Status = CommonEnums.DEVICESTATUS.ACTIVE;
-            await _deviceRepository.UpdateDevice(device);
+            
 
             Log newLog = new()
             {
@@ -463,6 +463,7 @@ namespace DataAccess.Services
             fb.UpdatedAt = DateTime.Now;
             fb.UpdatedBy = "Fixer";
 
+            await _deviceRepository.UpdateDevice(device);
             await _feedbackRepository.Update(fb);
             await _logRepository.Create(newLog);
         }

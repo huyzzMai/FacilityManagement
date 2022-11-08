@@ -32,7 +32,9 @@ namespace FacilityManagement.Controllers.FeedbackController
                 // Get id of current log in user 
                 int userId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
 
-                return Ok(await feedbackService.GetFeedbacksByFixerIdAndStatusIsAccept(userId));
+                var s = await feedbackService.GetFeedbacksByFixerIdAndStatusIsAccept(userId);
+
+                return Ok(s);
             }
             catch(Exception ex)
             {
@@ -49,7 +51,9 @@ namespace FacilityManagement.Controllers.FeedbackController
                 // Get id of current log in user 
                 int userId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
 
-                return Ok(await feedbackService.GetFeedbacksByFixerIdAndStatusIsClose(userId));
+                var s = await feedbackService.GetFeedbacksByFixerIdAndStatusIsClose(userId);
+
+                return Ok(s);
             }
             catch (Exception ex)
             {
@@ -72,11 +76,14 @@ namespace FacilityManagement.Controllers.FeedbackController
             }
         }
 
-        [HttpPut("feedback/{feedbackId:int}/fixer/{fixerId:int}")]
-        public async Task<IActionResult> ProcessFeedback(int fixerId, int feedbackId, string message)
+        [HttpPut("feedback/{feedbackId:int}")]
+        public async Task<IActionResult> ProcessFeedback(int feedbackId, string message)
         {
             try
             {
+                // Get id of current log in user 
+                int fixerId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
+
                 await feedbackService.ProcessFeedback(fixerId, feedbackId, message);
                 return Ok("Process completed successfully");
             }

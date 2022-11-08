@@ -15,6 +15,13 @@ namespace BusinessObject.Commons
             public const int FIXER = 3;
         }
 
+        public class DEPARTMENTID
+        {
+            public const int ADMINDEPARTMENT = 1;
+            public const int MAINTENANCEDEPARTMENT = 2;
+            public const int USERDEPARTMENT = 3;
+        }
+
         public class DEPARTMENTSTATUS
         {
             public const int ACTIVE = 0;
@@ -48,11 +55,6 @@ namespace BusinessObject.Commons
 
         public class FEEDBACKSTATUS
         {
-            //public const int PENDING = 1;
-            //public const int CLOSE = 2;
-            //public const int DENY = 3;
-            //public const int ACCEPT = 4;
-            //public const int DONE = 5;
             public const int PENDING = 1;
             public const int ACCEPT = 2;
             public const int DENY = 3;

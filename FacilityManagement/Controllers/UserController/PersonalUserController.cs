@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace FacilityManagement.Controllers.UserController
 {
-    [Route("api/personaluser")]
+    [Route("api/personal-user")]
     [ApiController]
-    //[Authorize(Roles = "Admin, User, Fixer")]
+    [Authorize(Roles = "Admin,User,Fixer")]
     public class PersonalUserController : ControllerBase
     {
         private readonly IUserService userService;
@@ -20,12 +20,15 @@ namespace FacilityManagement.Controllers.UserController
             this.userService = userService;
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetUserInformation(int id)
+        [HttpGet("information")]
+        public async Task<IActionResult> GetUserInformation()
         {
             try
             {
-                var u = await userService.GetUserById(id);
+                // Get id of current log in user 
+                int userId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
+
+                var u = await userService.GetUserById(userId);
                 var user = new UserInformationRespsonse
                 {
                     Email = u.Email,
@@ -42,12 +45,15 @@ namespace FacilityManagement.Controllers.UserController
             }
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserRequest model)
+        [HttpPut("information")]
+        public async Task<IActionResult> UpdateUser([FromBody] UserRequest model)
         {
             try
             {
-                var u = await userService.GetUserById(id);
+                // Get id of current log in user 
+                int userId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
+
+                var u = await userService.GetUserById(userId);
 
                 if (u == null)
                 {
@@ -56,7 +62,7 @@ namespace FacilityManagement.Controllers.UserController
                 }
                 else
                 {
-                    return Ok(await userService.UpdateUser(id, model));
+                    return Ok(await userService.UpdateUser(userId, model));
                 }
             }
             catch (Exception ex)

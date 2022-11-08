@@ -31,16 +31,42 @@ namespace FacilityManagement.Controllers.AuthenticationController
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var response = await userService.LoginUser(request); 
-            var token = response.Token;
-            if (token != null)
+            try
             {
-                  return Ok(new JwtSecurityTokenHandler().WriteToken(token));
-                
+                var response = await userService.LoginUser(request);
+                var token = response.Token;
+                if (token != null)
+                {
+                    //return Ok(new JwtSecurityTokenHandler().WriteToken(token));
+
+                    return StatusCode(StatusCodes.Status201Created,
+                       new JwtSecurityTokenHandler().WriteToken(token));
+                }
+                else
+                {
+                    return BadRequest("Invalid Credentials");
+                }
+            }catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
             }
-            else
+        }
+
+        [HttpPost("user-register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        {
+            try
             {
-                return BadRequest("Invalid Credentials");    
+                await userService.RegisterUser(request);
+                //return Ok("Register successfully!");
+                return StatusCode(StatusCodes.Status201Created,
+                       "Register successfully!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
             }
         }
 

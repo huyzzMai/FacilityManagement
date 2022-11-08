@@ -15,7 +15,7 @@ namespace DataAccess.IServices
     {
         int GetCurrentLoginUserId(string authHeader);
         Task<LoginResponse> LoginUser(LoginRequest request);
-        Task<LoginResponse> LoginUserForGoogle(User user);
+        Task RegisterUser(RegisterRequest request);
         Task<IEnumerable<UserResponse>> GetAllUsers();
         Task<User> GetUserById(int id);
         Task<User> GetUserByEmail(string email);

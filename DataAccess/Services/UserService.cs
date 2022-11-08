@@ -15,6 +15,8 @@ using Microsoft.IdentityModel.Tokens;
 using BusinessObject.Commons;
 using BusinessObject.ResponseModel.UserResponse;
 using BusinessObject.RequestModel.UserRequest;
+using System.Security.Cryptography;
+using System.IO;
 
 namespace DataAccess.Services
 {
@@ -47,6 +49,65 @@ namespace DataAccess.Services
         }
         #endregion
 
+        #region Encrypt Password
+        public string EncryptPassword(string plainText)
+        {
+            var key = "b14ca5898a4e4133bbce2ea2315a1916";
+            byte[] iv = new byte[16];
+            byte[] array;
+
+            using (Aes aes = Aes.Create())
+            {
+                aes.Key = Encoding.UTF8.GetBytes(key);
+                aes.IV = iv;
+
+                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    using (CryptoStream cryptoStream = new CryptoStream((Stream)memoryStream, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter streamWriter = new StreamWriter((Stream)cryptoStream))
+                        {
+                            streamWriter.Write(plainText);
+                        }
+
+                        array = memoryStream.ToArray();
+                    }
+                }
+            }
+
+            return Convert.ToBase64String(array);
+        }
+        #endregion
+
+        #region Decrypt Password
+        public string DecryptPassword(string plainText)
+        {
+            var key = "b14ca5898a4e4133bbce2ea2315a1916";
+            byte[] iv = new byte[16];
+            byte[] buffer = Convert.FromBase64String(plainText);
+
+            using (Aes aes = Aes.Create())
+            {
+                aes.Key = Encoding.UTF8.GetBytes(key);
+                aes.IV = iv;
+                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+                using (MemoryStream memoryStream = new MemoryStream(buffer))
+                {
+                    using (CryptoStream cryptoStream = new CryptoStream((Stream)memoryStream, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader streamReader = new StreamReader((Stream)cryptoStream))
+                        {
+                            return streamReader.ReadToEnd();
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
         public int GetCurrentLoginUserId(string authHeader)
         {
             var handler = new JwtSecurityTokenHandler();
@@ -60,11 +121,19 @@ namespace DataAccess.Services
 
         public async Task<LoginResponse> LoginUser(LoginRequest request)
         {
-            User user = await userRepository.GetUserByEmailAndPassword(request.Email, request.Password);
-            
-                String userId = user.Id.ToString();
+            User u = await userRepository.GetUserByEmailAndDeleteIsFalse(request.Email);
+            var decryptPass = DecryptPassword(u.Password); 
 
-                if (user.Role == CommonEnums.ROLE.ADMIN)
+            if (request.Password != decryptPass)
+            {
+                throw new Exception("Wrong password!");
+            }
+
+            //User user = await userRepository.GetUserByEmailAndPassword(request.Email, request.Password);
+            
+                String userId = u.Id.ToString();
+
+                if (u.Role == CommonEnums.ROLE.ADMIN)
                 {
                     var claims = new[]
                     {
@@ -77,7 +146,7 @@ namespace DataAccess.Services
                     var result = CreateToken(claims);
                     return result;
                 } 
-                else if (user.Role == CommonEnums.ROLE.FIXER)
+                else if (u.Role == CommonEnums.ROLE.FIXER)
                 {
                 var claims = new[]
                     {
@@ -98,27 +167,38 @@ namespace DataAccess.Services
                     new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                    new Claim("Id", userId)
+                    new Claim(JwtRegisteredClaimNames.NameId, userId)
                     }; 
                     var result = CreateToken(claims);
                     return result;
                 }
         }
 
-        public async Task<LoginResponse> LoginUserForGoogle(User user)
+        public async Task RegisterUser(RegisterRequest request)
         {
-            String userId = user.Id.ToString();
+            var u = await userRepository.GetUserByEmailAndDeleteIsFalse(request.Email);
 
-            var claims = new[]
-                    {
-                    new Claim(ClaimTypes.Role, "User"),
-                    new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                    new Claim("Id", userId)
-                    };
-            var result = CreateToken(claims);
-            return result;
+            if (u != null)
+            {
+                throw new Exception("Email has been used!");
+            }
+
+            var encryPass = EncryptPassword(request.Password);
+
+            User user = new User()
+            {
+                FullName = request.FullName,
+                Email = request.Email,
+                Password = encryPass,
+                DepartmentId = CommonEnums.DEPARTMENTID.USERDEPARTMENT,
+                Role = CommonEnums.ROLE.USER,
+                Status = CommonEnums.USERSTATUS.ACTIVE,
+                IsDeleted = false,
+                CreatedAt = DateTime.Now,
+                CreatedBy = "system"
+            };
+
+            await userRepository.SaveCreateUser(user);
         }
 
         public async Task<IEnumerable<UserResponse>> GetAllUsers()
@@ -200,7 +280,7 @@ namespace DataAccess.Services
 
             if (u != null)
             {
-                throw new Exception("This user cannot be updated!");
+                throw new Exception("Email has been used!");
             }
             if (request.Role != CommonEnums.ROLE.FIXER || request.Role != CommonEnums.ROLE.ADMIN)
             {
@@ -257,6 +337,7 @@ namespace DataAccess.Services
             u.Email = model.Email;
             u.Image = model.Image;
             u.UpdatedAt = DateTime.Now;
+            u.UpdatedBy = "system";
 
             await userRepository.SaveUser(u);
 
