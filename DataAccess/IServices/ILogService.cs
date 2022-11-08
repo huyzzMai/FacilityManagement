@@ -15,5 +15,6 @@ namespace DataAccess.IServices
         Task DeleteLog(int id);
         Task<IEnumerable<LogResponse>> GetAllLog();
         Task<LogResponse> GetLogById(int id);
+        Task<LogStatisticResponse> GetLogStatisticCurrentMonth();
     }
 }
