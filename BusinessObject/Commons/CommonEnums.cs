@@ -61,7 +61,7 @@ namespace BusinessObject.Commons
             public const int FEEDBACK_DENY = 2;
             public const int FEEDBACK_ACCEPT = 3;
             public const int FEEDBACK_CLOSE = 4;
-
+            public const int FEEDBACK_DONE = 5;
         }
     }
 }

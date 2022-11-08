@@ -98,6 +98,15 @@ namespace DataAccess.Repositories
             return logs;
         }
 
+        public async Task<IEnumerable<Log>> GetLogsByFixerId(int id)
+        {
+            IEnumerable<Log> logs = await _facilityFeedbackManagementContext.Logs
+                    .Where(f => f.FixerId == id)
+                    .Include("Feedback")
+                    .AsNoTracking().ToListAsync();
+            return logs;
+        }
+
         public async Task<Log> GetLogByFeedbackIdAndLogStatusIsAccept(int id)
         {
             Log log = await _facilityFeedbackManagementContext.Logs.SingleOrDefaultAsync(l => l.FeedbackId == id && l.Status==CommonEnums.LOGSTATUS.FEEDBACK_ACCEPT);

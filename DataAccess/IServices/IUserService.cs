@@ -13,6 +13,7 @@ namespace DataAccess.IServices
 {
     public interface IUserService
     {
+        int GetCurrentLoginUserId(string authHeader);
         Task<LoginResponse> LoginUser(LoginRequest request);
         Task<LoginResponse> LoginUserForGoogle(User user);
         Task<IEnumerable<UserResponse>> GetAllUsers();

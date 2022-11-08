@@ -55,5 +55,12 @@ namespace DataAccess.Repositories
             dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
         }
+
+        public User GetUserAndDeleteIsFalseNoTask(int id)
+        {
+            User us = dbContext.Users.Where(u => u.Id.Equals(id) && u.IsDeleted == false)
+                .FirstOrDefault();
+            return us;
+        }
     }
 }

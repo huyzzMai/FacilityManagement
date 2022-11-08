@@ -18,5 +18,6 @@ namespace DataAccess.IRepositories
         Task SaveUser(User user);
         // Save user for creation
         Task SaveCreateUser(User user); 
+        User GetUserAndDeleteIsFalseNoTask(int id);
     }
 }

@@ -3,30 +3,55 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FacilityManagement.Controllers.FeedbackController
 {
     [Route("api/fixerfeedback")]
     [ApiController]
-    //[Authorize(Roles = "Fixer")]
+    [Authorize(Roles = "Fixer")]
     public class FixerFeedbackController : ControllerBase
     {
         private readonly IFeedbackService feedbackService;
 
-        public FixerFeedbackController(IFeedbackService feedbackService)
+        private readonly IUserService userService;
+
+        public FixerFeedbackController(IFeedbackService feedbackService, IUserService userService)
         {
             this.feedbackService = feedbackService; 
+            this.userService = userService;
         }
 
-        [HttpGet("user/{userId:int}")]
-        public async Task<IActionResult> GetFeedbackListByFixerId(int userId)
+        [HttpGet("accept-feedback")]
+        public async Task<IActionResult> GetAcceptFeedbackListByFixerId()
         {
             try
             {
-                return Ok(await feedbackService.GetAllFeedbackByUserId(userId));
+                // Get id of current log in user 
+                int userId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
+
+                return Ok(await feedbackService.GetFeedbacksByFixerIdAndStatusIsAccept(userId));
             }
             catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
+        [HttpGet("close-feedback")]
+        public async Task<IActionResult> GetCLoseFeedbackListByFixerId()
+        {
+            try
+            {
+                // Get id of current log in user 
+                int userId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
+
+                return Ok(await feedbackService.GetFeedbacksByFixerIdAndStatusIsClose(userId));
+            }
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ex.Message);

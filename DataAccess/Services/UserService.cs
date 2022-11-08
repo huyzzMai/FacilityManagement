@@ -47,6 +47,17 @@ namespace DataAccess.Services
         }
         #endregion
 
+        public int GetCurrentLoginUserId(string authHeader)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            authHeader = authHeader.Replace("Bearer ", "");
+            var jsonToken = handler.ReadToken(authHeader);
+            var tokenS = handler.ReadToken(authHeader) as JwtSecurityToken;
+            var id = tokenS.Claims.First(claim => claim.Type == "nameid").Value;
+            int userId = int.Parse(id);
+            return userId;
+        }
+
         public async Task<LoginResponse> LoginUser(LoginRequest request)
         {
             User user = await userRepository.GetUserByEmailAndPassword(request.Email, request.Password);
@@ -74,7 +85,7 @@ namespace DataAccess.Services
                     new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                    new Claim("Id", userId)
+                    new Claim(JwtRegisteredClaimNames.NameId, userId)
                     };
                     var result = CreateToken(claims);
                     return result;
