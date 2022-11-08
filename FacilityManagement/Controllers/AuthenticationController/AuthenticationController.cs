@@ -27,7 +27,7 @@ namespace FacilityManagement.Controllers.AuthenticationController
             this.userService = userService;
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -37,10 +37,7 @@ namespace FacilityManagement.Controllers.AuthenticationController
                 var token = response.Token;
                 if (token != null)
                 {
-                    //return Ok(new JwtSecurityTokenHandler().WriteToken(token));
-
-                    return StatusCode(StatusCodes.Status201Created,
-                       new JwtSecurityTokenHandler().WriteToken(token));
+                    return Ok(new JwtSecurityTokenHandler().WriteToken(token));
                 }
                 else
                 {
@@ -59,7 +56,6 @@ namespace FacilityManagement.Controllers.AuthenticationController
             try
             {
                 await userService.RegisterUser(request);
-                //return Ok("Register successfully!");
                 return StatusCode(StatusCodes.Status201Created,
                        "Register successfully!");
             }

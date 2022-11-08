@@ -21,8 +21,9 @@ namespace DataAccess.IServices
         Task<User> GetUserByEmail(string email);
         Task<User> CreateUserByGoogleLogin(GoogleUserCreateRequest request);
         Task <EmployeeCreateResponse> CreateEmployee(EmployeeCreateRequest request);  
-        Task<UserResponse> UpdateUser(int id, UserRequest model);
-        Task UpdateUserStatus(int id, int request);
+        Task UpdateUser(int id, UserRequest model);
+        Task BanUser(int id);
+        Task RemoveBanUser(int id);
         Task DeleteUser(int id);
 
     }

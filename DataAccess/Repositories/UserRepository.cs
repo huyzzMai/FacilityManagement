@@ -20,7 +20,8 @@ namespace DataAccess.Repositories
 
         public async Task<List<User>> GetAllUsers()
         {
-            List<User> users = await dbContext.Users.ToListAsync();
+            List<User> users = await dbContext.Users
+                .Where(u => u.IsDeleted == false).ToListAsync();
             return users;
         }
 
@@ -30,12 +31,6 @@ namespace DataAccess.Repositories
                 .Include("Department")
                 .FirstOrDefaultAsync();
             return us;
-        }
-
-        public async Task<User> GetUserByEmailAndPassword(string email, string password)
-        {
-            User user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.Password == password);
-            return user;    
         }
 
         public async Task<User> GetUserByEmailAndDeleteIsFalse(string email)

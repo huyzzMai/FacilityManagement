@@ -1,4 +1,6 @@
-﻿using BusinessObject.RequestModel.DepartmentRequest;
+﻿using BusinessObject.Commons;
+using BusinessObject.RequestModel.DepartmentRequest;
+using BusinessObject.ResponseModel.DepartmentResponse;
 using DataAccess.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +13,7 @@ namespace FacilityManagement.Controllers.DepartmentController
 {
     [Route("api/department")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService departmentService;
@@ -28,6 +30,44 @@ namespace FacilityManagement.Controllers.DepartmentController
                 return Ok(await departmentService.GetAllDepartments());
             }
             catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetDepartmentById(int id){
+            try
+            {
+                var d = await departmentService.GetDepartmentById(id);
+                if (d == null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error retrieving data from the database.");
+                }
+
+                string status = null;
+                if (d.Status == CommonEnums.DEPARTMENTSTATUS.ACTIVE)
+                {
+                    status = "ACTIVE";
+                }
+                else if (d.Status == CommonEnums.DEPARTMENTSTATUS.BUSY)
+                {
+                    status = "BUSY";
+                }
+
+                var department = new DepartmentResponse()
+                {
+                    Id = d.Id,
+                    DepartmentName = d.Name,
+                    Status = status
+                };
+
+                return Ok(department);
+
+            }
+            catch(Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ex.Message);
@@ -64,6 +104,13 @@ namespace FacilityManagement.Controllers.DepartmentController
         {
             try
             {
+                var check = await departmentService.GetDepartmentByName(model.DepartmentName);
+                if(check != null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Department name already existed!");
+                }
+
                 var d = await departmentService.GetDepartmentById(id);
 
                 if (d == null)
@@ -73,7 +120,8 @@ namespace FacilityManagement.Controllers.DepartmentController
                 }
                 else
                 {
-                    return Ok(await departmentService.UpdateDepartment(id, model));
+                    await departmentService.UpdateDepartment(id, model);
+                    return Ok("Department updated successfully!");
                 }
             }
             catch (Exception ex)
@@ -128,7 +176,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                 else
                 {
                     await departmentService.DeleteDepartment(id);
-                    return Ok();
+                    return Ok("Delete successfully!");
                 }
             }
             catch (Exception ex)

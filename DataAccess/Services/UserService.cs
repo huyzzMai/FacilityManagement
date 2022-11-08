@@ -129,8 +129,6 @@ namespace DataAccess.Services
                 throw new Exception("Wrong password!");
             }
 
-            //User user = await userRepository.GetUserByEmailAndPassword(request.Email, request.Password);
-            
                 String userId = u.Id.ToString();
 
                 if (u.Role == CommonEnums.ROLE.ADMIN)
@@ -141,7 +139,7 @@ namespace DataAccess.Services
                     new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                    new Claim("Id", userId)
+                    new Claim(JwtRegisteredClaimNames.NameId, userId)
                     };
                     var result = CreateToken(claims);
                     return result;
@@ -224,15 +222,16 @@ namespace DataAccess.Services
 
                     if (user.Status == CommonEnums.USERSTATUS.ACTIVE)
                     {
-                        status = "Active";
+                        status = "ACTIVE";
                     }
                     else
                     {
-                        status = "Inactive";
+                        status = "BAN";
                     }
 
                     return new UserResponse()
                     {
+                        Id = user.Id,
                         FullName = user.FullName,
                         Email = user.Email,
                         Image = user.Image,
@@ -282,11 +281,12 @@ namespace DataAccess.Services
             {
                 throw new Exception("Email has been used!");
             }
-            if (request.Role != CommonEnums.ROLE.FIXER || request.Role != CommonEnums.ROLE.ADMIN)
+            if (request.Role != CommonEnums.ROLE.FIXER && request.Role != CommonEnums.ROLE.ADMIN)
             {
                 throw new Exception("Invalid role!");
             }
 
+            // Generate password
             string RandomString(int size, bool lowerCase = false)
             {
                 var builder = new StringBuilder(size);
@@ -307,11 +307,28 @@ namespace DataAccess.Services
             sb.Append(RandomString(8, true));
             string pw = sb.ToString();
 
+            string encryptPassword = EncryptPassword(pw);
+
+            int department;
+            if(request.Role == CommonEnums.ROLE.ADMIN)
+            {
+                department = CommonEnums.DEPARTMENTID.ADMINDEPARTMENT;
+            }
+            else
+            {
+                department = CommonEnums.DEPARTMENTID.MAINTENANCEDEPARTMENT;
+            }
+
             User user = new User()
             {
                 Email = request.Email,
-                Password = pw,
+                Password = encryptPassword,
                 Role = request.Role,
+                DepartmentId = department,
+                Status = CommonEnums.USERSTATUS.ACTIVE,
+                IsDeleted = false,
+                CreatedAt = DateTime.Now,
+                CreatedBy = "admin"
             };
 
             await userRepository.SaveCreateUser(user);  
@@ -319,12 +336,12 @@ namespace DataAccess.Services
             var rs = new EmployeeCreateResponse
             {
                 Email = user.Email,
-                Password = user.Password,
+                Password = pw,
             };
             return rs;
         }
 
-        public async Task<UserResponse> UpdateUser(int id, UserRequest model)
+        public async Task UpdateUser(int id, UserRequest model)
         {
             var u = await userRepository.GetUserAndDeleteIsFalse(id);
 
@@ -333,26 +350,55 @@ namespace DataAccess.Services
                 throw new Exception("This user cannot be updated!");
             }
 
-            u.FullName = model.FullName;
-            u.Email = model.Email;
-            u.Image = model.Image;
+            var check = await userRepository.GetUserByEmailAndDeleteIsFalse(model.Email);
+            if(check != null)
+            {
+                throw new Exception("This email existed!");
+            }
+
+            if (model.FullName == null)
+            {
+                u.FullName = u.FullName;
+            }
+            else
+            {
+                u.FullName = model.FullName;
+            }
+
+            if (model.Email == null)
+            {
+                u.Email = u.Email;
+            }
+            else {
+                u.Email = model.Email;
+            }
+
+            if (model.Email == null)
+            {
+                u.Image = u.Image;
+            }
+            else
+            {
+                u.Image = model.Image;
+            }
+
             u.UpdatedAt = DateTime.Now;
             u.UpdatedBy = "system";
 
             await userRepository.SaveUser(u);
 
-            var upuser = new UserResponse()
-            {
-                FullName = u.FullName,
-                Email = u.Email,
-                Image = u.Image
+            //var upuser = new UserResponse()
+            //{
+            //    FullName = u.FullName,
+            //    Email = u.Email,
+            //    Image = u.Image
 
-            };
+            //};
 
-            return upuser;
+            //return upuser;
         }
 
-        public async Task UpdateUserStatus(int id, int request)
+        public async Task BanUser(int id)
         {
             User u = await userRepository.GetUserAndDeleteIsFalse(id);
             if(u == null)
@@ -360,37 +406,37 @@ namespace DataAccess.Services
                 throw new Exception("This user is unavailable to update.");
             }
 
-            if (request == CommonEnums.USERSTATUS.BAN)
-            {
                 if (u.Status != CommonEnums.USERSTATUS.BAN) 
                 {
                     u.Status = CommonEnums.USERSTATUS.BAN;
                     u.UpdatedAt = DateTime.Now;
-                    u.UpdatedBy = "Admin";
+                    u.UpdatedBy = "admin";
                     await userRepository.SaveUser(u);
                 }
                 else
                 {
                     throw new Exception("This user already ban!");
                 }
-            }
-            else if (request == CommonEnums.USERSTATUS.REMOVEBAN)
+        }
+
+        public async Task RemoveBanUser(int id)
+        {
+            User u = await userRepository.GetUserAndDeleteIsFalse(id);
+            if (u == null)
             {
-                if (u.Status == CommonEnums.USERSTATUS.BAN)
-                {
-                    u.Status = CommonEnums.USERSTATUS.ACTIVE;
-                    u.UpdatedAt = DateTime.Now;
-                    u.UpdatedBy = "Admin";
-                    await userRepository.SaveUser(u);
-                }
-                else
-                {
-                    throw new Exception("This user already active!");
-                }
+                throw new Exception("This user is unavailable to update.");
+            }
+
+            if (u.Status == CommonEnums.USERSTATUS.BAN)
+            {
+                u.Status = CommonEnums.USERSTATUS.ACTIVE;
+                u.UpdatedAt = DateTime.Now;
+                u.UpdatedBy = "Admin";
+                await userRepository.SaveUser(u);
             }
             else
             {
-                throw new Exception("Action can not be executed!");
+                throw new Exception("This user already active!");
             }
         }
 
@@ -406,6 +452,7 @@ namespace DataAccess.Services
             u.IsDeleted = true;
             u.Status = CommonEnums.USERSTATUS.INACTIVE;
             u.UpdatedAt = DateTime.Now;
+            u.UpdatedBy = "admin";
 
             await userRepository.SaveUser(u);
         }

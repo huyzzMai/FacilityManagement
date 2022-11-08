@@ -62,7 +62,8 @@ namespace FacilityManagement.Controllers.UserController
                 }
                 else
                 {
-                    return Ok(await userService.UpdateUser(userId, model));
+                    await userService.UpdateUser(userId, model);
+                    return Ok("Update successfully!");
                 }
             }
             catch (Exception ex)
