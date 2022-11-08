@@ -18,8 +18,4 @@
     <None Remove="RequestModel\" />
     <None Remove="ResponseModel\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="RequestModel\" />
-    <Folder Include="ResponseModel\" />
-  </ItemGroup>
 </Project>

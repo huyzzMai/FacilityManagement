@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 
 #nullable disable
 
@@ -12,9 +13,12 @@ namespace BusinessObject.Models
         {
         }
 
-        public FacilityFeedbackManagementContext(DbContextOptions<FacilityFeedbackManagementContext> options)
+        public IConfiguration Configuration { get; }
+
+        public FacilityFeedbackManagementContext(DbContextOptions<FacilityFeedbackManagementContext> options, IConfiguration configuration)
             : base(options)
         {
+            Configuration = configuration;
         }
 
         public virtual DbSet<Department> Departments { get; set; }
@@ -29,8 +33,7 @@ namespace BusinessObject.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("server =localhost; database = FacilityFeedbackManagement;uid=sa;pwd=Sa123456;");
+                optionsBuilder.UseSqlServer(Configuration.GetConnectionString("DBConnection"));            
             }
         }
 
@@ -42,7 +45,7 @@ namespace BusinessObject.Models
             {
                 entity.ToTable("Department");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
 
@@ -63,7 +66,7 @@ namespace BusinessObject.Models
             {
                 entity.ToTable("Device");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
 
@@ -77,9 +80,9 @@ namespace BusinessObject.Models
 
                 entity.Property(e => e.RoomId).HasColumnName("RoomID");
 
-                entity.Property(e => e.Status)
-                    .HasMaxLength(10)
-                    .IsFixedLength(true);
+                //entity.Property(e => e.Status)
+                //    .HasMaxLength(10)
+                //    .IsFixedLength(true);
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
 
@@ -103,7 +106,7 @@ namespace BusinessObject.Models
             {
                 entity.ToTable("DeviceType");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
 
@@ -132,7 +135,7 @@ namespace BusinessObject.Models
             {
                 entity.ToTable("Feedback");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
 
@@ -144,9 +147,7 @@ namespace BusinessObject.Models
                     .IsRequired()
                     .HasMaxLength(200);
 
-                entity.Property(e => e.DeviceTypeId).HasColumnName("DeviceTypeID");
-
-                entity.Property(e => e.ResponseId).HasColumnName("ResponseID");
+                entity.Property(e => e.DeviceId).HasColumnName("DeviceID");
 
                 entity.Property(e => e.RoomId).HasColumnName("RoomID");
 
@@ -158,11 +159,11 @@ namespace BusinessObject.Models
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
-                entity.HasOne(d => d.DeviceType)
+                entity.HasOne(d => d.Device)
                     .WithMany(p => p.Feedbacks)
-                    .HasForeignKey(d => d.DeviceTypeId)
+                    .HasForeignKey(d => d.DeviceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Feedback_DeviceType");
+                    .HasConstraintName("FK_Feedback_Device");
 
                 entity.HasOne(d => d.Room)
                     .WithMany(p => p.Feedbacks)
@@ -178,9 +179,9 @@ namespace BusinessObject.Models
 
             modelBuilder.Entity<Log>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("Log");
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
 
@@ -193,6 +194,7 @@ namespace BusinessObject.Models
                 entity.Property(e => e.DeviceId).HasColumnName("DeviceID");
 
                 entity.Property(e => e.FeedbackId).HasColumnName("FeedbackID");
+                entity.Property(e => e.FixerId).HasColumnName("FixerID");
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
 
@@ -211,13 +213,19 @@ namespace BusinessObject.Models
                     .HasForeignKey(d => d.FeedbackId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Log_Feedback");
+
+                entity.HasOne(d => d.User)
+                    .WithMany()
+                    .HasForeignKey(d => d.FixerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Log_User");
             });
 
             modelBuilder.Entity<Room>(entity =>
             {
                 entity.ToTable("Room");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
 
@@ -244,7 +252,7 @@ namespace BusinessObject.Models
             {
                 entity.ToTable("User");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
 
