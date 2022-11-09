@@ -87,7 +87,7 @@ namespace DataAccess.Services
                 throw new Exception("This device is being fixed!");
             }
 
-            Room r = await _roomRepository.GetRoomAndDeleteIsFalse(feedbackRequest.roomId);
+            Room r = await _roomRepository.GetRoomAndDeleteIsFalse(d.RoomId ?? default(int));
             if(r.Status == CommonEnums.DEVICESTATUS.INACTIVE)
             {
                 throw new Exception("This room is not available!");
@@ -101,7 +101,7 @@ namespace DataAccess.Services
             Feedback feedback = new()
             {
                 UserId = userId,
-                RoomId = feedbackRequest.roomId,
+                RoomId = d.RoomId ?? default(int),
                 DeviceId = feedbackRequest.deviceId,
                 Description = feedbackRequest.description,
                 Image = feedbackRequest.image,

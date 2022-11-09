@@ -11,7 +11,6 @@ namespace BusinessObject.RequestModel.FeedbackRequest
     {
         public int deviceId;
 
-        public int roomId;
         public byte[] image;
 
         public string description;
