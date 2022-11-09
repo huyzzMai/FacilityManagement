@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject.RequestModel.UserRequest
+namespace BusinessObject.ResponseModel.UserResponse
 {
-    public class EmployeeCreateRequest
+    public class FixerResponse
     {
+        public int Id { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
-        public int Role { get; set; }
     }
 }

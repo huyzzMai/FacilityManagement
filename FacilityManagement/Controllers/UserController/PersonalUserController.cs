@@ -72,5 +72,22 @@ namespace FacilityManagement.Controllers.UserController
                     ex.Message);
             }
         }
+
+        [HttpPut("password")]
+        public async Task<IActionResult> UpdatePassword(string oldPass, string newPass)
+        {
+            try
+            {
+                // Get id of current log in user 
+                int userId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
+                await userService.UpdatePassword(userId, oldPass, newPass);
+                return Ok("Password updated successfully");
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
     }
 }

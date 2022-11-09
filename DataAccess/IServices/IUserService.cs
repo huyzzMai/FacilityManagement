@@ -13,10 +13,12 @@ namespace DataAccess.IServices
 {
     public interface IUserService
     {
+        Task UpdatePassword(int userId, string oldPass, string newPass);
         int GetCurrentLoginUserId(string authHeader);
         Task<LoginResponse> LoginUser(LoginRequest request);
         Task RegisterUser(RegisterRequest request);
         Task<IEnumerable<UserResponse>> GetAllUsers();
+        Task<IEnumerable<FixerResponse>> GetFixerList();
         Task<User> GetUserById(int id);
         Task<User> GetUserByEmail(string email);
         Task<User> CreateUserByGoogleLogin(GoogleUserCreateRequest request);
