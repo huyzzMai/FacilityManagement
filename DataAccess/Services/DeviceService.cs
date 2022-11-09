@@ -54,10 +54,8 @@ namespace DataAccess.Services
             IEnumerable<DeviceResponse> result = devices.Select(
                 device =>
                 {
-
                     return new DeviceResponse()
                     {
-
                         DeviceTypeID = device.DeviceTypeId,
                         RoomID = device.RoomId,
                         Name = device.Name,
@@ -72,47 +70,90 @@ namespace DataAccess.Services
         {
             var r = await deviceRepository.GetDeviceAndDeleteIsFalse(id);
             var u = await deviceRepository.GetDeviceByName(devices.Name);
+            var h = await deviceRepository.GetDeviceByRoomID(devices.RoomID);
+            var g = await deviceRepository.GetDeviceByDeviceTypeID(devices.DeviceTypeID);
 
             if (r == null)
             {
                 throw new Exception("This Device cannot be updated because there is no room with that id!");
             }
-            if (u == null)
+            if (u == null && h != null && g != null)
             {
-                r.DeviceTypeId = devices.DeviceTypeID;
-                r.RoomId = devices.RoomID;
-                r.Name = devices.Name;
-                r.Status = devices.Status;
+                if (devices.DeviceTypeID == null)
+                {
+                    r.DeviceTypeId = r.DeviceTypeId;
+                }
+                else
+                {
+                    r.DeviceTypeId = devices.DeviceTypeID;
+                }
+                if (devices.RoomID == null)
+                {
+                    r.RoomId = r.RoomId;
+                }
+                else
+                {
+                    r.RoomId = devices.RoomID;
+                }
+                if (devices.Name == null)
+                {
+                    r.Name = r.Name;
+                }
+                else
+                {
+                    r.Name = devices.Name;
+                }
+                
+                if (devices.Status == null)
+                {
+                    r.Status = r.Status;
+                }
+                else
+                {
+                    r.Status = devices.Status;
+                }
+                //r.DeviceTypeId = devices.DeviceTypeID;
+                //r.RoomId = devices.RoomID;
+                //r.Name = devices.Name;
+                //r.Status = ;
                 r.UpdatedAt = DateTime.Now;
+                r.UpdatedBy = "Admin";
 
                 await deviceRepository.UpdateDevice(r);
 
                 var updevice = new DeviceResponse()
-                {
-                    Name = r.Name,
+                {   
+                    DeviceTypeID = devices.DeviceTypeID,
+                    RoomID = devices.RoomID,
+                    Name = r.Name
+
                 };
 
                 return updevice;
             }
             else
             {
-                throw new Exception("This Device already existed!");
+                throw new Exception("Another device already existed with this name" +
+                    " or the roomID,DeviceTypeID are not found, please try again!");
             }
         }
 
         public async Task<DeviceResponse> CreateDevice(DeviceRequest devices)
         {
             var r = await deviceRepository.GetDeviceByName(devices.Name);
+            var h = await deviceRepository.GetDeviceByRoomID(devices.RoomID);
+            var g = await deviceRepository.GetDeviceByDeviceTypeID(devices.DeviceTypeID);
 
-            if (r == null)
+            if (r == null && h != null && g != null)
             {
                 Device rms = new Device();
                 rms.DeviceTypeId = devices.DeviceTypeID;
                 rms.RoomId = devices.RoomID;
                 rms.Name = devices.Name;
-                rms.Status = devices.Status;
+                rms.Status = 0;
                 rms.IsDeleted = false;
                 rms.CreatedAt = DateTime.Now;
+                rms.CreatedBy = "Admin";
                 await deviceRepository.SaveDevice(rms);
 
                 var updevice = new DeviceResponse()
@@ -127,9 +168,11 @@ namespace DataAccess.Services
             }
             else
             {
-                throw new Exception("This room existed!");
+                throw new Exception("This Device already exist or roomID, DeviceTypeID are not found, please try again!");
             }
 
         }
+
+        
     }
 }

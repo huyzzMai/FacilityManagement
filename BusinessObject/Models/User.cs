@@ -19,7 +19,8 @@ namespace BusinessObject.Models
         public string Email { get; set; }
         public int? Role { get; set; }
         public int? Status { get; set; }
-        public string Image { get; set; }
+        //public string Image { get; set; }
+        public byte[] Image { get; set; }
         public bool? IsDeleted { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

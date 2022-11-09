@@ -71,21 +71,44 @@ namespace DataAccess.Services
             }
         }
 
-        async Task<int> IFeedbackService.CreateFeedback(FeedbackRequest feedbackRequest)
+        public async Task<int> CreateFeedback(FeedbackRequest feedbackRequest, int userId)
         {
             //try
             //{
+            User u = await _userRepository.GetUserAndDeleteIsFalse(userId);
+            if (u.Status == CommonEnums.USERSTATUS.BAN)
+            {
+                throw new Exception("You have been banned!");
+            }
+
+            Device d = await _deviceRepository.GetDeviceAndDeleteIsFalse(feedbackRequest.deviceId);
+            if (d.Status == CommonEnums.DEVICESTATUS.INACTIVE)
+            {
+                throw new Exception("This device is being fixed!");
+            }
+
+            Room r = await _roomRepository.GetRoomAndDeleteIsFalse(d.RoomId ?? default(int));
+            if(r.Status == CommonEnums.DEVICESTATUS.INACTIVE)
+            {
+                throw new Exception("This room is not available!");
+            }
+
+            if(feedbackRequest.description == null)
+            {
+                throw new Exception("You must describe the condition!");
+            }
+
             Feedback feedback = new()
             {
-                UserId = feedbackRequest.userId,
-                RoomId = feedbackRequest.roomId,
+                UserId = userId,
+                RoomId = d.RoomId ?? default(int),
                 DeviceId = feedbackRequest.deviceId,
                 Description = feedbackRequest.description,
                 Image = feedbackRequest.image,
                 Status = CommonEnums.FEEDBACKSTATUS.PENDING,
                 IsDeleted = false,
                 CreatedAt = DateTime.Today,
-                CreatedBy = feedbackRequest.userId.ToString(),
+                CreatedBy = userId.ToString(),
 
             };
             await _feedbackRepository.Create(feedback);
@@ -443,7 +466,7 @@ namespace DataAccess.Services
             }
 
             //update device status
-            var device = await _deviceRepository.GetDeviceAndDeleteIsFalse(fb.DeviceId);
+            var device = fb.Device;
             device.Status = CommonEnums.DEVICESTATUS.ACTIVE;
             
 

@@ -9,8 +9,8 @@ namespace DataAccess.IRepositories
 {
     public interface IUserRepository
     {
-        Task<User> GetUserByEmailAndPassword(string email, string password);
         Task<List<User>> GetAllUsers();
+        Task<List<User>> GetFixerList();
         // Get active user
         Task<User> GetUserAndDeleteIsFalse(int id);
         Task<User> GetUserByEmailAndDeleteIsFalse(string email);

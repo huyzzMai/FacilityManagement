@@ -8,8 +8,8 @@ namespace BusinessObject.RequestModel.DeviceTypeRequest
 {
     public class DeviceTypeRequest
     {
-        public int DepartmentId { get; set; }
+        //public int DepartmentId { get; set; }
         public string Name { get; set; }
-        public int? Status { get; set; }
+        //public int? Status { get; set; }
     }
 }

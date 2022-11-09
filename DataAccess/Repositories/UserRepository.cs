@@ -1,4 +1,5 @@
-﻿using BusinessObject.Models;
+﻿using BusinessObject.Commons;
+using BusinessObject.Models;
 using DataAccess.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -20,7 +21,16 @@ namespace DataAccess.Repositories
 
         public async Task<List<User>> GetAllUsers()
         {
-            List<User> users = await dbContext.Users.ToListAsync();
+            List<User> users = await dbContext.Users
+                .Where(u => u.IsDeleted == false).ToListAsync();
+            return users;
+        }
+
+        public async Task<List<User>> GetFixerList()
+        {
+            List<User> users = await dbContext.Users
+                .Where(u => u.IsDeleted == false && u.Role == CommonEnums.ROLE.FIXER)
+                .ToListAsync();
             return users;
         }
 
@@ -30,12 +40,6 @@ namespace DataAccess.Repositories
                 .Include("Department")
                 .FirstOrDefaultAsync();
             return us;
-        }
-
-        public async Task<User> GetUserByEmailAndPassword(string email, string password)
-        {
-            User user = await dbContext.Users.SingleOrDefaultAsync(u => u.Email == email && u.Password == password);
-            return user;    
         }
 
         public async Task<User> GetUserByEmailAndDeleteIsFalse(string email)

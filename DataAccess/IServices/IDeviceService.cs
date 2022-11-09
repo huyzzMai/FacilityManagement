@@ -10,6 +10,8 @@ namespace DataAccess.IServices
     {
         Task<IEnumerable<DeviceResponse>> GetAllDevice();
         Task<Device> GetDeviceById(int id);
+        //Task<Device> GetDeviceByRoomID(int id);
+        //Task<Device> GetDeviceByDeviceTypeID(int id);
         Task<Device> GetDeviceByName(string name);
         Task<DeviceResponse> UpdateDevice(int id, DeviceRequest devices);
         Task<DeviceResponse> CreateDevice(DeviceRequest devices);

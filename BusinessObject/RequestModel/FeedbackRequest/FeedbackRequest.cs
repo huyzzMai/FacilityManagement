@@ -9,11 +9,8 @@ namespace BusinessObject.RequestModel.FeedbackRequest
 {
     public class FeedbackRequest
     {
-        public int userId;
-
         public int deviceId;
 
-        public int roomId;
         public byte[] image;
 
         public string description;

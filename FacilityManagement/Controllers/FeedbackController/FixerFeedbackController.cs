@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FacilityManagement.Controllers.FeedbackController
 {
-    [Route("api/fixerfeedback")]
+    [Route("api/fixer-feedback")]
     [ApiController]
     [Authorize(Roles = "Fixer")]
     public class FixerFeedbackController : ControllerBase

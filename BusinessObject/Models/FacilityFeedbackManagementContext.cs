@@ -266,7 +266,8 @@ namespace BusinessObject.Models
 
                 entity.Property(e => e.FullName).HasMaxLength(50);
 
-                entity.Property(e => e.Image).HasMaxLength(200);
+                //entity.Property(e => e.Image).HasMaxLength(200);
+                entity.Property(e => e.Image).HasColumnName("Image"); 
 
                 entity.Property(e => e.Password).HasMaxLength(50);
 

@@ -48,22 +48,37 @@ namespace FacilityManagement.Controllers.UserController
             }
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserRequest model)
+        //[HttpPut("{id:int}")]
+        //public async Task<IActionResult> UpdateUser(int id, [FromBody] UserRequest model)
+        //{
+        //    try
+        //    {
+        //        var u = await userService.GetUserById(id);
+
+        //        if (u == null)
+        //        {
+        //            return StatusCode(StatusCodes.Status500InternalServerError,
+        //            "Error retrieving data from the database.");
+        //        }
+        //        else
+        //        {
+        //            return Ok(await userService.UpdateUser(id, model));
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError,
+        //            ex.Message);
+        //    }
+        //}
+
+        [HttpPut("status/ban/{id:int}")]
+        public async Task<IActionResult> BanUser(int id)
         {
             try
             {
-                var u = await userService.GetUserById(id);
-
-                if (u == null)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error retrieving data from the database.");
-                }
-                else
-                {
-                    return Ok(await userService.UpdateUser(id, model));
-                }
+                await userService.BanUser(id);
+                return Ok("Status updated successfully.");
             }
             catch (Exception ex)
             {
@@ -72,15 +87,15 @@ namespace FacilityManagement.Controllers.UserController
             }
         }
 
-        [HttpPut("updatestatus/{id:int}")]
-        public async Task<IActionResult> ChangeUserStatus(int id, int request)
+        [HttpPut("status/remove-ban/{id:int}")]
+        public async Task<IActionResult> RemoveBanUser(int id)
         {
             try
             {
-                await userService.UpdateUserStatus(id, request);
-                return Ok("Status updated successfully.");
+                await userService.RemoveBanUser(id);
+                return Ok("Remove ban user successfully.");
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ex.Message);
@@ -102,7 +117,7 @@ namespace FacilityManagement.Controllers.UserController
                 else
                 {
                     await userService.DeleteUser(id);
-                    return Ok();
+                    return Ok("User deleted successfully!");
                 }
             }
             catch (Exception ex)

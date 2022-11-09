@@ -9,7 +9,7 @@ namespace DataAccess.IServices
 {
     public interface IFeedbackService
     {
-        Task<int> CreateFeedback(FeedbackRequest feedbackRequest);
+        Task<int> CreateFeedback(FeedbackRequest feedbackRequest, int userId);
         Task UpdateFeedback(int id, FeedbackUpdateRequest feedbackRequest);
         Task DeleteFeedback(int id);
         Task<IEnumerable<FeedbackResponse>> GetAllFeedback();

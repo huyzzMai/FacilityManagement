@@ -17,7 +17,7 @@ namespace DataAccess.Repositories
 
         public async Task<List<DeviceType>> GetAllDeviceType()
         {
-            List<DeviceType> devices = await dbContext.DeviceTypes.ToListAsync();
+            List<DeviceType> devices = await dbContext.DeviceTypes.Where(d => d.IsDeleted == false).ToListAsync();
             return devices;
         }
         public async Task<DeviceType> GetDeviceTypeByName(string name)

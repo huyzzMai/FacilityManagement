@@ -27,7 +27,7 @@ namespace FacilityManagement.Controllers.AuthenticationController
             this.userService = userService;
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -59,7 +59,6 @@ namespace FacilityManagement.Controllers.AuthenticationController
             try
             {
                 await userService.RegisterUser(request);
-                //return Ok("Register successfully!");
                 return StatusCode(StatusCodes.Status201Created,
                        "Register successfully!");
             }

@@ -11,7 +11,8 @@ namespace DataAccess.IServices
         Task<IEnumerable<DeviceTypeResponse>> GetAllDeviceType();
         Task<DeviceType> GetDeviceTypeById(int id);
         Task<DeviceType> GetDeviceTypeByName(string name);
-        Task<DeviceTypeResponse> UpdateDeviceType(int id, DeviceTypeRequest deviceTypes);
+        //Task<DeviceTypeResponse> UpdateDeviceType(int id, DeviceTypeRequest deviceTypes);
+        Task UpdateDeviceType(int id, DeviceTypeRequest deviceTypes);
         Task<DeviceTypeResponse> CreateDeviceType(DeviceTypeRequest deviceTypes);
         Task DeleteDeviceType(int id);
     }
