@@ -35,7 +35,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-        //[Authorize(Roles = "Admin")]
+      
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetDepartmentById(int id){
             try
@@ -73,7 +73,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-        //[Authorize(Roles = "Admin")]
+    
         [HttpPost]
         public async Task<IActionResult> CreateDepartment([FromBody] DepartmentRequest model)
         {
@@ -98,7 +98,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-        //[Authorize(Roles = "Admin")]
+       
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentRequest model)
         {
@@ -130,7 +130,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-        //[Authorize(Roles = "Admin")]
+        
         [HttpPut("status/busy/{id:int}")]
         public async Task<IActionResult> UpdateBusyDepartmentStatus(int id)
         {
@@ -145,7 +145,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-        //[Authorize(Roles = "Admin")]
+        
         [HttpPut("status/remove-busy/{id:int}")]
         public async Task<IActionResult> RemoveBusyDepartmentStatus(int id)
         {
@@ -160,7 +160,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-        //[Authorize(Roles = "Admin")]
+       
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
