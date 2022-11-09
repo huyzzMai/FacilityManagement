@@ -92,6 +92,7 @@ namespace DataAccess.Services
                 r.Name = devices.Name;
                 r.Status = devices.Status;
                 r.UpdatedAt = DateTime.Now;
+                r.CreatedBy = "Admin";
 
                 await deviceTypeRepository.UpdateDeviceType(r);
 
@@ -101,12 +102,12 @@ namespace DataAccess.Services
                 };
 
                 return updevice;
-            }
+        }
             else
             {
                 throw new Exception("This Device Type already existed!");
-            }
-        }
+    }
+}
 
         public async Task<DeviceTypeResponse> CreateDeviceType(DeviceTypeRequest devices)
         {

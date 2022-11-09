@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace DataAccess.Services
 {
@@ -47,9 +48,13 @@ namespace DataAccess.Services
                     {
                         status = "Active";
                     }
-                    else
+                    else if (room.Status == CommonEnums.ROOMSTATUS.INACTIVE)
                     {
                         status = "InActive";
+                    } 
+                    else
+                    {
+                        status = "Fixing";
                     }
 
                     return new RoomResponse()
@@ -78,6 +83,7 @@ namespace DataAccess.Services
                 r.Level = rooms.Level;
                 r.Status = rooms.Status;
                 r.UpdatedAt = DateTime.Now;
+                r.UpdatedBy = "Admin";
 
                 await roomRepository.UpdateRoom(r);
 
@@ -107,15 +113,42 @@ namespace DataAccess.Services
                 rms.Status = rooms.Status;
                 rms.IsDeleted = false;
                 rms.CreatedAt = DateTime.Now;
+                rms.CreatedBy = "Admin";
+
                 await roomRepository.SaveRoom(rms);
 
-                var uproom = new RoomResponse()
+                if (rms.Status == 0)
                 {
-                    Name = rms.Name,
-                    Level = rms.Level,
-                };
+                    var uproom = new RoomResponse()
+                    {
+                        Name = rms.Name,
+                        Level = rms.Level,
+                        Status = "Active"
+                    };
+                    return uproom;
+                }
+                else if (rms.Status == 1)
+                {
+                    var uproom = new RoomResponse()
+                    {
+                        Name = rms.Name,
+                        Level = rms.Level,
+                        Status = "InActive"
+                    };
+                    return uproom;
+                }
+                else
+                {
+                    var uproom = new RoomResponse()
+                    {
+                        Name = rms.Name,
+                        Level = rms.Level,
+                        Status = "Fixing"
+                    };
+                    return uproom;
 
-                return uproom;
+                }
+
             }
             else
             {

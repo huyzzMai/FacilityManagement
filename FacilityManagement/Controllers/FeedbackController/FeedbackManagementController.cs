@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FacilityManagement.Controllers.FeedbackController
 {
-    [Route("api/[controller]")]
+    [Route("api/feedback-management")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class FeedbackManagementController : ControllerBase

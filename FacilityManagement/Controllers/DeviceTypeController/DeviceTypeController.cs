@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System;
 using BusinessObject.RequestModel.DeviceTypeRequest;
+using DataAccess.Services;
 
 namespace FacilityManagement.Controllers.DeviceType
 {
-    [Route("api/[controller]")]
+    [Route("api/device-type")]
     [ApiController]
     public class DeviceTypeController : ControllerBase
     {
@@ -40,8 +41,9 @@ namespace FacilityManagement.Controllers.DeviceType
 
                 if (r == null)
                 {
-                    await deviceTypeService.CreateDeviceType(devices);
-                    return Ok();
+                    
+                    return StatusCode(StatusCodes.Status201Created,
+                    await deviceTypeService.CreateDeviceType(devices));
                 }
                 else
                 {

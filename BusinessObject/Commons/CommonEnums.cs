@@ -44,6 +44,7 @@ namespace BusinessObject.Commons
         {
             public const int ACTIVE = 0;
             public const int INACTIVE = 1;
+            public const int FIXING = 2;
         }
 
         public class FEEDBACKSTATUS

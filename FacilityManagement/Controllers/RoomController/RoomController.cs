@@ -7,10 +7,11 @@ using BusinessObject.Models;
 using BusinessObject.RequestModel.RoomRequest;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Authorization;
+using DataAccess.Services;
 
 namespace FacilityManagement.Controllers.RoomController
 {
-    [Route("api/[controller]")]
+    [Route("api/room")]
     [ApiController]
     [Authorize(Roles = "Admin, User")]
     public class RoomController : ControllerBase
@@ -46,8 +47,9 @@ namespace FacilityManagement.Controllers.RoomController
 
                 if (r == null)
                 {
-                    await roomService.CreateRoom(rooms);
-                    return Ok();
+                    
+                    return StatusCode(StatusCodes.Status201Created,
+                    await roomService.CreateRoom(rooms));
                 }
                 else
                 {

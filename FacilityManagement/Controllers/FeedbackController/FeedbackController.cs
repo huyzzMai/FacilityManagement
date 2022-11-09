@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace FacilityManagement.Controllers.FeedbackController
 {
-    [Route("api/[controller]")]
+    [Route("api/feedback")]
     [ApiController]
     //[Authorize(Roles = "Admin, User, Fixer")]
     public class FeedbackController : ControllerBase

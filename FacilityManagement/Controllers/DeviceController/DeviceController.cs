@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System;
+using DataAccess.Services;
 
 namespace FacilityManagement.Controllers.DeviceController
 {
-    [Route("api/[controller]")]
+    [Route("api/device")]
     [ApiController]
     public class DeviceController : ControllerBase
     {
@@ -40,8 +41,9 @@ namespace FacilityManagement.Controllers.DeviceController
 
                 if (r == null)
                 {
-                    await deviceService.CreateDevice(devices);
-                    return Ok();
+                    
+                    return StatusCode(StatusCodes.Status201Created,
+                    await deviceService.CreateDevice(devices)); 
                 }
                 else
                 {

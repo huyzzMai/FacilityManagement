@@ -19,7 +19,7 @@ namespace DataAccess.Repositories
 
         public async Task<List<Room>> GetAllRoom()
         {
-            List<Room> rooms = await dbContext.Rooms.ToListAsync();
+            List<Room> rooms = await dbContext.Rooms.Where(p => p.IsDeleted == false).ToListAsync();
             return rooms;
         }
         public async Task<Room> GetRoomByName(string name)

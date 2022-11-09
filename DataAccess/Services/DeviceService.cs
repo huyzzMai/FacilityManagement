@@ -113,6 +113,7 @@ namespace DataAccess.Services
                 rms.Status = devices.Status;
                 rms.IsDeleted = false;
                 rms.CreatedAt = DateTime.Now;
+                rms.CreatedBy = "Admin";
                 await deviceRepository.SaveDevice(rms);
 
                 var updevice = new DeviceResponse()
