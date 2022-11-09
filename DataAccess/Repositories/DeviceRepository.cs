@@ -27,6 +27,16 @@ namespace DataAccess.Repositories
             Device rm = await dbContext.Devices.Where(r => r.Name == name && r.IsDeleted == false).FirstOrDefaultAsync();
             return rm;
         }
+        public async Task<Device> GetDeviceByDeviceTypeID(int id)
+        {
+            Device rm = await dbContext.Devices.Where(r => r.DeviceTypeId.Equals(id) && r.IsDeleted == false).FirstOrDefaultAsync();
+            return rm;
+        }
+        public async Task<Device> GetDeviceByRoomID(int id)
+        {
+            Device rm = await dbContext.Devices.Where(r => r.RoomId.Equals(id) && r.IsDeleted == false).FirstOrDefaultAsync();
+            return rm;
+        }
         public async Task<Device> GetDeviceAndDeleteIsFalse(int id)
         {
             Device rm = await dbContext.Devices.Where(r => r.Id.Equals(id) && r.IsDeleted == false)

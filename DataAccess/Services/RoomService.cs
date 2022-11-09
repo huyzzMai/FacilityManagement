@@ -54,7 +54,7 @@ namespace DataAccess.Services
                     } 
                     else
                     {
-                        status = "Fixing";
+                        status = "Occupied";
                     }
 
                     return new RoomResponse()
@@ -68,7 +68,7 @@ namespace DataAccess.Services
                 .ToList();
             return result;
         }
-        public async Task<RoomResponse> UpdateRoom(int id, RoomRequest rooms)
+        public async Task UpdateRoom(int id, RoomRequest rooms)
         {
             var r = await roomRepository.GetRoomAndDeleteIsFalse(id);
             var u = await roomRepository.GetRoomByName(rooms.Name);
@@ -79,76 +79,108 @@ namespace DataAccess.Services
             }
             if (u == null)
             {
-                r.Name = rooms.Name;
-                r.Level = rooms.Level;
-                r.Status = rooms.Status;
+                if (rooms.Name == null)
+                {
+                    r.Name = r.Name;
+                }
+                else
+                {
+                    r.Name = rooms.Name;
+                }
+                if (rooms.Level == null)
+                {
+                    r.Level = r.Level;
+                }
+                else
+                {
+                    r.Level = rooms.Level;
+                }
+                
+                //r.Status = rooms.Status;
                 r.UpdatedAt = DateTime.Now;
                 r.UpdatedBy = "Admin";
 
                 await roomRepository.UpdateRoom(r);
 
-                var uproom = new RoomResponse()
-                {
-                    Name = r.Name,
-                    Level = r.Level,
-                };
+                //var uproom = new RoomResponse()
+                //{
+                //    Name = r.Name,
+                //    Level = r.Level,
+                //    Status = ""
+                //};
 
-                return uproom;
+                //return uproom;
             }
             else
             {
-                throw new Exception("Room already existed!");
+                throw new Exception("Another room already existed with this name, please try again!");
             }
+        }
+
+        public async Task UpdateRoomStatusInActive(int id)
+        {
+            var r = await roomRepository.GetRoomAndDeleteIsFalse(id);
+
+            if (r == null)
+            {
+                throw new Exception("This room cannot be updated because there is no room with that id!");
+            }
+            if (r.Status == CommonEnums.ROOMSTATUS.INACTIVE)
+            {
+                throw new Exception("This room is already inactive");
+            }
+            r.Status = CommonEnums.ROOMSTATUS.INACTIVE;
+                r.UpdatedAt = DateTime.Now;
+                r.UpdatedBy = "Admin";
+
+                await roomRepository.UpdateRoom(r);
+           
+        }
+
+        public async Task RemoveRoomStatusInActive(int id)
+        {
+            var r = await roomRepository.GetRoomAndDeleteIsFalse(id);
+
+            if (r == null)
+            {
+                throw new Exception("This room cannot be updated because there is no room with that id!");
+            }
+            if (r.Status != CommonEnums.ROOMSTATUS.INACTIVE)
+            {
+                throw new Exception("This room is already active");
+            }
+                r.Status = CommonEnums.ROOMSTATUS.ACTIVE;
+                r.UpdatedAt = DateTime.Now;
+                r.UpdatedBy = "Admin";
+
+                await roomRepository.UpdateRoom(r);
+            
+
         }
 
         public async Task<RoomResponse> CreateRoom(RoomRequest rooms)
         {
             var r = await roomRepository.GetRoomByName(rooms.Name);
-            
+
             if (r == null)
             {
                 Room rms = new Room();
                 rms.Name = rooms.Name;
                 rms.Level = rooms.Level;
-                rms.Status = rooms.Status;
+                rms.Status = CommonEnums.ROOMSTATUS.ACTIVE;
                 rms.IsDeleted = false;
                 rms.CreatedAt = DateTime.Now;
                 rms.CreatedBy = "Admin";
 
                 await roomRepository.SaveRoom(rms);
 
-                if (rms.Status == 0)
+                var uproom = new RoomResponse()
                 {
-                    var uproom = new RoomResponse()
-                    {
-                        Name = rms.Name,
-                        Level = rms.Level,
-                        Status = "Active"
-                    };
-                    return uproom;
-                }
-                else if (rms.Status == 1)
-                {
-                    var uproom = new RoomResponse()
-                    {
-                        Name = rms.Name,
-                        Level = rms.Level,
-                        Status = "InActive"
-                    };
-                    return uproom;
-                }
-                else
-                {
-                    var uproom = new RoomResponse()
-                    {
-                        Name = rms.Name,
-                        Level = rms.Level,
-                        Status = "Fixing"
-                    };
-                    return uproom;
-
-                }
-
+                    Name = rms.Name,
+                    Level = rms.Level,
+                    Status = "Active"
+                };
+                return uproom;
             }
             else
             {

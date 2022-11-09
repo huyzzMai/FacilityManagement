@@ -5,11 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System;
 using DataAccess.Services;
+using BusinessObject.Commons;
+using BusinessObject.ResponseModel.DeviceResponse;
 
 namespace FacilityManagement.Controllers.DeviceController
 {
     [Route("api/device")]
     [ApiController]
+    //[Authorize(Roles = "Admin, User")]
     public class DeviceController : ControllerBase
     {
         private readonly IDeviceService deviceService;
@@ -31,6 +34,48 @@ namespace FacilityManagement.Controllers.DeviceController
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving data from the database");
             }
         }
+        //[Authorize(Roles = "Admin")]
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetDeviceById(int id)
+        {
+            try
+            {
+                var d = await deviceService.GetDeviceById(id);
+                if (d == null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Can not found this id in database.");
+                }
+
+                string status = null;
+                if (d.Status == CommonEnums.DEVICESTATUS.ACTIVE)
+                {
+                    status = "ACTIVE";
+                }
+                else if (d.Status == CommonEnums.DEVICESTATUS.INACTIVE)
+                {
+                    status = "INACTIVE";
+                }
+
+                var device = new DeviceResponse()
+                {
+                    DeviceTypeID = d.DeviceTypeId,
+                    RoomID = d.RoomId,
+                    Name = d.Name,
+                    Status = d.Status
+                };
+
+                return Ok(device);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
+        //[Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateDevice([FromBody] DeviceRequest devices)
         {
@@ -52,13 +97,13 @@ namespace FacilityManagement.Controllers.DeviceController
 
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                     "Error creating user!");
+                    ex.Message);
             }
         }
-
+        //[Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateDevice(int id, [FromBody] DeviceRequest devices)
         {
@@ -73,7 +118,8 @@ namespace FacilityManagement.Controllers.DeviceController
                 }
                 else
                 {
-                    return Ok(await deviceService.UpdateDevice(id, devices));
+                    await deviceService.UpdateDevice(id, devices);
+                    return Ok("Update Successfully");
 
                 }
             }
@@ -83,7 +129,7 @@ namespace FacilityManagement.Controllers.DeviceController
                     ex.Message);
             }
         }
-
+        //[Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteDevice(int id)
         {
@@ -99,13 +145,13 @@ namespace FacilityManagement.Controllers.DeviceController
                 else
                 {
                     await deviceService.DeleteDevice(id);
-                    return Ok();
+                    return Ok("This Device have been deleted successfully");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                     "Error deleting user!");
+                    ex.Message);
             }
         }
     }

@@ -9,8 +9,8 @@ namespace BusinessObject.RequestModel.DeviceRequest
     public class DeviceRequest
     {
         public int DeviceTypeID { get; set; }
-        public int? RoomID { get; set; }
+        public int RoomID { get; set; }
         public string Name { get; set; }
-        public int? Status { get; set; }
+        public int Status { get; set; }
     }
 }

@@ -56,28 +56,29 @@ namespace DataAccess.Services
             IEnumerable<DeviceTypeResponse> result = devices.Select(
                 device =>
                 {
-                    // Cast status from int to string for response
-                    string status;
-                    if (device.Status == CommonEnums.DEVICETYPETATUS.ACTIVE)
-                    {
-                        status = "Active";
-                    }
-                    else
-                    {
-                        status = "InActive";
-                    }
+                    //// Cast status from int to string for response
+                    //string status;
+                    //if (device.Status == CommonEnums.DEVICETYPETATUS.ACTIVE)
+                    //{
+                    //    status = "Active";
+                    //}
+                    //else
+                    //{
+                    //    status = "InActive";
+                    //}
 
                     return new DeviceTypeResponse()
                     {
-                        Name = device.Name,
-                        Status = status
+                        DepartmentId = device.DepartmentId,
+                        Name = device.Name
+                        //Status = status
                     };
                 }
                 )
                 .ToList();
             return result;
         }
-        public async Task<DeviceTypeResponse> UpdateDeviceType(int id, DeviceTypeRequest devices)
+        public async Task UpdateDeviceType(int id, DeviceTypeRequest devices)
         {
             var r = await deviceTypeRepository.GetDeviceTypeAndDeleteIsFalse(id);
             var u = await deviceTypeRepository.GetDeviceTypeByName(devices.Name);
@@ -88,24 +89,31 @@ namespace DataAccess.Services
             }
             if (u == null)
             {
-                r.DepartmentId = devices.DepartmentId;
-                r.Name = devices.Name;
-                r.Status = devices.Status;
+                
+                if (devices.Name == null)
+                {
+                    r.Name = r.Name;
+                }
+                else
+                {
+                    r.Name = devices.Name;
+                }
+                //r.Status = devices.Status;
                 r.UpdatedAt = DateTime.Now;
-                r.CreatedBy = "Admin";
+                r.UpdatedBy = "Admin";
 
                 await deviceTypeRepository.UpdateDeviceType(r);
 
-                var updevice = new DeviceTypeResponse()
-                {
-                    Name = r.Name,
-                };
+                //var updevice = new DeviceTypeResponse()
+                //{
+                //    Name = r.Name
+                //};
 
-                return updevice;
+                //return updevice;
         }
             else
             {
-                throw new Exception("This Device Type already existed!");
+                throw new Exception("Another device type already existed with this name, please try again!");
     }
 }
 
@@ -116,17 +124,19 @@ namespace DataAccess.Services
             if (r == null)
             {
                 DeviceType rms = new DeviceType();
-                rms.DepartmentId= devices.DepartmentId;
+                rms.DepartmentId= CommonEnums.DEPARTMENTID.FACILITYDEPARTMENT;
                 rms.Name = devices.Name;
-                rms.Status = devices.Status;
+                //rms.Status = CommonEnums.;
                 rms.IsDeleted = false;
                 rms.CreatedAt = DateTime.Now;
+                rms.CreatedBy = "Admin";
+
                 await deviceTypeRepository.SaveDeviceType(rms);
 
                 var updevice = new DeviceTypeResponse()
                 {
                     DepartmentId = rms.DepartmentId,
-                    Name = rms.Name,
+                    Name = rms.Name
                 };
 
                 return updevice;

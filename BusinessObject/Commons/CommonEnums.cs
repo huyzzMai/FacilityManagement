@@ -20,6 +20,7 @@ namespace BusinessObject.Commons
             public const int ADMINDEPARTMENT = 1;
             public const int MAINTENANCEDEPARTMENT = 2;
             public const int USERDEPARTMENT = 3;
+            public const int FACILITYDEPARTMENT = 4;
         }
 
         public class DEPARTMENTSTATUS
@@ -29,11 +30,11 @@ namespace BusinessObject.Commons
             public const int BUSY = 2;
             public const int REMOVEBUSY = 3;
         }
-        public class DEVICETYPETATUS
-        {
-            public const int ACTIVE = 0;
-            public const int INACTIVE = 1;
-        }
+        //public class DEVICETYPETATUS
+        //{
+        //    public const int ACTIVE = 0;
+        //    public const int INACTIVE = 1;
+        //}
         public class DEVICESTATUS
         {
             public const int ACTIVE = 0;
@@ -51,7 +52,7 @@ namespace BusinessObject.Commons
         {
             public const int ACTIVE = 0;
             public const int INACTIVE = 1;
-            public const int FIXING = 2;
+            //public const int OCCUPIED = 2;
         }
 
         public class FEEDBACKSTATUS
