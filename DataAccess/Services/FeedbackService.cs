@@ -75,6 +75,29 @@ namespace DataAccess.Services
         {
             //try
             //{
+            User u = await _userRepository.GetUserAndDeleteIsFalse(userId);
+            if (u.Status == CommonEnums.USERSTATUS.BAN)
+            {
+                throw new Exception("You have been banned!");
+            }
+
+            Device d = await _deviceRepository.GetDeviceAndDeleteIsFalse(feedbackRequest.deviceId);
+            if (d.Status == CommonEnums.DEVICESTATUS.INACTIVE)
+            {
+                throw new Exception("This device is being fixed!");
+            }
+
+            Room r = await _roomRepository.GetRoomAndDeleteIsFalse(feedbackRequest.roomId);
+            if(r.Status == CommonEnums.DEVICESTATUS.INACTIVE)
+            {
+                throw new Exception("This room is not available!");
+            }
+
+            if(feedbackRequest.description == null)
+            {
+                throw new Exception("You must describe the condition!");
+            }
+
             Feedback feedback = new()
             {
                 UserId = userId,

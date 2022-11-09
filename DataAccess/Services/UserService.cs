@@ -416,7 +416,7 @@ namespace DataAccess.Services
                 u.Email = model.Email;
             }
 
-            if (model.Email == null)
+            if (model.Image == null)
             {
                 u.Image = u.Image;
             }
