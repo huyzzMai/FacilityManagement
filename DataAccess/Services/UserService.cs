@@ -108,6 +108,26 @@ namespace DataAccess.Services
         }
         #endregion
 
+        public async Task UpdatePassword(int userId, string oldPass, string newPass)
+        {
+            var user = await userRepository.GetUserAndDeleteIsFalse(userId);
+
+            string decryptOldPass = DecryptPassword(user.Password);
+
+            if(decryptOldPass != oldPass)
+            {
+                throw new Exception("Old password wrong!");
+            }
+
+            string encryptNewPass = EncryptPassword(newPass);
+
+            user.Password = encryptNewPass;
+            user.UpdatedAt = DateTime.Now;
+            user.UpdatedBy = userId.ToString();
+
+            await userRepository.SaveUser(user);
+        }
+
         public int GetCurrentLoginUserId(string authHeader)
         {
             var handler = new JwtSecurityTokenHandler();
@@ -122,6 +142,10 @@ namespace DataAccess.Services
         public async Task<LoginResponse> LoginUser(LoginRequest request)
         {
             User u = await userRepository.GetUserByEmailAndDeleteIsFalse(request.Email);
+            if(u == null)
+            {
+                throw new Exception("Email is wrong!");
+            }
             var decryptPass = DecryptPassword(u.Password); 
 
             if (request.Password != decryptPass)
@@ -244,6 +268,24 @@ namespace DataAccess.Services
             return result;  
         }
 
+        public async Task<IEnumerable<FixerResponse>> GetFixerList()
+        {
+            var users = await userRepository.GetFixerList();
+            IEnumerable<FixerResponse> result = users.Select(
+                user =>
+                {
+                    return new FixerResponse()
+                    {
+                        Id = user.Id,
+                        FullName = user.FullName,
+                        Email = user.Email
+                    };
+                }
+                )
+                .ToList();
+            return result;
+        }
+
         public async Task<User> GetUserById(int id)
         {
             User u = await userRepository.GetUserAndDeleteIsFalse(id);
@@ -322,6 +364,7 @@ namespace DataAccess.Services
             User user = new User()
             {
                 Email = request.Email,
+                FullName = request.FullName,
                 Password = encryptPassword,
                 Role = request.Role,
                 DepartmentId = department,
@@ -383,7 +426,7 @@ namespace DataAccess.Services
             }
 
             u.UpdatedAt = DateTime.Now;
-            u.UpdatedBy = "system";
+            u.UpdatedBy = id.ToString();
 
             await userRepository.SaveUser(u);
 
@@ -450,7 +493,6 @@ namespace DataAccess.Services
             }
             
             u.IsDeleted = true;
-            u.Status = CommonEnums.USERSTATUS.INACTIVE;
             u.UpdatedAt = DateTime.Now;
             u.UpdatedBy = "admin";
 

@@ -1,4 +1,5 @@
-﻿using BusinessObject.Models;
+﻿using BusinessObject.Commons;
+using BusinessObject.Models;
 using DataAccess.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,6 +23,14 @@ namespace DataAccess.Repositories
         {
             List<User> users = await dbContext.Users
                 .Where(u => u.IsDeleted == false).ToListAsync();
+            return users;
+        }
+
+        public async Task<List<User>> GetFixerList()
+        {
+            List<User> users = await dbContext.Users
+                .Where(u => u.IsDeleted == false && u.Role == CommonEnums.ROLE.FIXER)
+                .ToListAsync();
             return users;
         }
 

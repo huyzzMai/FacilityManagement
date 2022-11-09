@@ -71,13 +71,13 @@ namespace DataAccess.Services
             }
         }
 
-        async Task<int> IFeedbackService.CreateFeedback(FeedbackRequest feedbackRequest)
+        public async Task<int> CreateFeedback(FeedbackRequest feedbackRequest, int userId)
         {
             //try
             //{
             Feedback feedback = new()
             {
-                UserId = feedbackRequest.userId,
+                UserId = userId,
                 RoomId = feedbackRequest.roomId,
                 DeviceId = feedbackRequest.deviceId,
                 Description = feedbackRequest.description,
@@ -85,7 +85,7 @@ namespace DataAccess.Services
                 Status = CommonEnums.FEEDBACKSTATUS.PENDING,
                 IsDeleted = false,
                 CreatedAt = DateTime.Today,
-                CreatedBy = feedbackRequest.userId.ToString(),
+                CreatedBy = userId.ToString(),
 
             };
             await _feedbackRepository.Create(feedback);
@@ -443,7 +443,7 @@ namespace DataAccess.Services
             }
 
             //update device status
-            var device = await _deviceRepository.GetDeviceAndDeleteIsFalse(fb.DeviceId);
+            var device = fb.Device;
             device.Status = CommonEnums.DEVICESTATUS.ACTIVE;
             
 

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -16,10 +17,12 @@ namespace FacilityManagement.Controllers.FeedbackController
     public class FeedbackManagementController : ControllerBase
     {
         private readonly IFeedbackService _service;
+        private readonly IUserService _userService;
 
-        public FeedbackManagementController(IFeedbackService service)
+        public FeedbackManagementController(IFeedbackService service, IUserService userService)
         {
             _service = service;
+            _userService = userService;
         }
 
         // GET: api/Feedback
@@ -46,7 +49,7 @@ namespace FacilityManagement.Controllers.FeedbackController
         }
 
         // GET: api/Feedback/Pending
-        [HttpGet("Pending")]
+        [HttpGet("pending")]
         public async Task<IEnumerable<FeedbackResponse>> GetFeedbacksOnPending()
         {
             var feedbacks = await _service.GetAllFeedbackOnPending();
@@ -54,10 +57,24 @@ namespace FacilityManagement.Controllers.FeedbackController
             return feedbacks;
         }
 
+        [HttpGet("fixers")]
+        public async Task<IActionResult> GetFixerList()
+        {
+            try
+            {
+                return Ok(await _userService.GetFixerList());
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
         // PUT: api/Feedback/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutFeedback(int id, FeedbackUpdateRequest feedback)
+        public async Task<IActionResult> PutFeedback(int id, [FromBody] FeedbackUpdateRequest feedback)
         {
             try
             {
@@ -73,7 +90,7 @@ namespace FacilityManagement.Controllers.FeedbackController
 
         // PUT: api/Feedback/AcceptFeedback/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("AcceptFeedback/{id}")]
+        [HttpPut("accept-feedback/{id}")]
         public async Task<IActionResult> PutAcceptFeedback(int id, int fixerId)
         {
             try
@@ -91,7 +108,7 @@ namespace FacilityManagement.Controllers.FeedbackController
 
         // PUT: api/Feedback/DenyFeedback/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("DenyFeedback/{id}")]
+        [HttpPut("deny-feedback/{id}")]
         public async Task<IActionResult> PutDenyFeedback(int id)
         {
             try
@@ -109,21 +126,21 @@ namespace FacilityManagement.Controllers.FeedbackController
 
         // PUT: api/Feedback/CloseFeedback/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("CloseFeedback/{id}")]
-        public async Task<IActionResult> PutCloseFeedback(int id)
-        {
-            try
-            {
-                await _service.CloseFeedback(id);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
+        //[HttpPut("CloseFeedback/{id}")]
+        //public async Task<IActionResult> PutCloseFeedback(int id)
+        //{
+        //    try
+        //    {
+        //        await _service.CloseFeedback(id);
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
 
-                throw;
-            }
+        //        throw;
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         // DELETE: api/Feedback/5
         [HttpDelete("{id}")]

@@ -37,7 +37,10 @@ namespace FacilityManagement.Controllers.AuthenticationController
                 var token = response.Token;
                 if (token != null)
                 {
-                    return Ok(new JwtSecurityTokenHandler().WriteToken(token));
+                    //return Ok(new JwtSecurityTokenHandler().WriteToken(token));
+
+                    return StatusCode(StatusCodes.Status201Created,
+                       new JwtSecurityTokenHandler().WriteToken(token));
                 }
                 else
                 {
