@@ -73,7 +73,7 @@ namespace DataAccess.Services
                 Status = CommonEnums.DEPARTMENTSTATUS.ACTIVE,
                 IsDeleted = false,
                 CreatedAt = DateTime.Now,
-                CreatedBy = "Admin"
+                CreatedBy = "admin"
                 
             };
 
@@ -89,7 +89,7 @@ namespace DataAccess.Services
             return upde;
         }
 
-        public async Task<DepartmentResponse> UpdateDepartment(int id, DepartmentRequest request)
+        public async Task UpdateDepartment(int id, DepartmentRequest request)
         {
             Department d = await departmentRepository.GetDepartmentAndDeleteIsFalse(id);
 
@@ -98,20 +98,27 @@ namespace DataAccess.Services
                 throw new Exception("This department cannot be update!");
             }
 
-            d.Name = request.DepartmentName;
+            if (request.DepartmentName == null)
+            {
+                d.Name = d.Name;
+            }
+            else
+            {
+                d.Name = request.DepartmentName;
+            }
             d.UpdatedAt = DateTime.Now;
-            d.UpdatedBy = "Admin";
+            d.UpdatedBy = "admin";
 
             await departmentRepository.SaveDepartment(d);
 
-            var upde = new DepartmentResponse()
-            {   
-                Id = d.Id,
-                DepartmentName = d.Name,
-                Status = "Active"
-            };
+            //var upde = new DepartmentResponse()
+            //{   
+            //    Id = d.Id,
+            //    DepartmentName = d.Name,
+            //    Status = "Active"
+            //};
 
-            return upde;
+            //return upde;
         }
 
         public async Task AddBusyStatus(int id)
@@ -166,9 +173,8 @@ namespace DataAccess.Services
             }
 
             d.IsDeleted = true;
-            d.Status = CommonEnums.DEPARTMENTSTATUS.INACTIVE;
             d.UpdatedAt = DateTime.Now;
-            d.UpdatedBy = "Admin";
+            d.UpdatedBy = "admin";
 
             await departmentRepository.SaveDepartment(d);
         }

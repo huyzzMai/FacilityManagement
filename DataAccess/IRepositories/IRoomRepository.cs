@@ -11,5 +11,6 @@ namespace DataAccess.IRepositories
         Task<Room> GetRoomByName(string roomName);
         Task SaveRoom(Room room);
         Task UpdateRoom(Room room);
+        Room GetRoomAndDeleteIsFalseNoTask(int id);
     }
 }

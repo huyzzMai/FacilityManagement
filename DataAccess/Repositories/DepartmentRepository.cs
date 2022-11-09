@@ -20,7 +20,8 @@ namespace DataAccess.Repositories
 
         public async Task<List<Department>> GetAllDepartments()
         {
-            List<Department> departments = await dbContext.Departments.ToListAsync();
+            List<Department> departments = await dbContext.Departments
+                .Where(d => d.IsDeleted == false).ToListAsync();
             return departments;
         }
 

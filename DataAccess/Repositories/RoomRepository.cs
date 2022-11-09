@@ -49,5 +49,12 @@ namespace DataAccess.Repositories
             dbContext.Rooms.Update(room);
             await dbContext.SaveChangesAsync();
         }
+
+        public Room GetRoomAndDeleteIsFalseNoTask(int id)
+        {
+            Room rm = dbContext.Rooms.Where(r => r.Id.Equals(id) && r.IsDeleted == false)
+                .FirstOrDefault();
+            return rm;
+        }
     }
 }

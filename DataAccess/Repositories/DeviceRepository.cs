@@ -43,5 +43,12 @@ namespace DataAccess.Repositories
             dbContext.Devices.Update(devices);
             await dbContext.SaveChangesAsync();
         }
+
+        public Device GetDeviceAndDeleteIsFalseNoTask(int id)
+        {
+            Device rm = dbContext.Devices.Where(r => r.Id.Equals(id) && r.IsDeleted == false)
+                .FirstOrDefault();
+            return rm;
+        }
     }
 }

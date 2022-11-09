@@ -12,5 +12,6 @@ namespace DataAccess.IRepositories
         Task<Device> GetDeviceByName(string name);
         Task SaveDevice(Device device);
         Task UpdateDevice(Device device);
+        Device GetDeviceAndDeleteIsFalseNoTask(int id);
     }
 }

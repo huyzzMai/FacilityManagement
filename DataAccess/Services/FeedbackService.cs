@@ -17,13 +17,15 @@ namespace DataAccess.Services
         private readonly ILogRepository _logRepository;
         private readonly IDeviceRepository _deviceRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IRoomRepository _roomRepository;
 
-        public FeedbackService(IFeedbackRepository feedbackRepository, ILogRepository logRepository, IDeviceRepository deviceRepository, IUserRepository userRepository)
+        public FeedbackService(IFeedbackRepository feedbackRepository, ILogRepository logRepository, IDeviceRepository deviceRepository, IUserRepository userRepository, IRoomRepository roomRepository)
         {
             _feedbackRepository = feedbackRepository;
             _logRepository = logRepository;
             _deviceRepository = deviceRepository;
             _userRepository = userRepository;
+            _roomRepository = roomRepository;
         }
 
         async Task IFeedbackService.UpdateFeedback(int id, FeedbackUpdateRequest feedbackRequest)
@@ -280,6 +282,136 @@ namespace DataAccess.Services
             return feedbacks.Where(f => f.UserId.GetValueOrDefault().Equals(userId)).Select(f => Feedback.MapToResponse(f));
         }
 
+        public async Task<IEnumerable<FeedbackResponse>> GetFeedbacksByFixerIdAndStatusIsAccept(int id)
+        {
+            // Get logs of fixer with status Accpet and Close 
+            var logs = await _logRepository.GetLogsByFixerId(id);
+            if(logs == null)
+            {
+                throw new Exception("Fixer has no feedback.");
+            }
+
+            List<Log> fbClose = new List<Log>();
+            List<Log> fbAccept = new List<Log>();
+            List<Feedback> feedbacks = new List<Feedback>();
+
+            // Get logs with status Accept
+            foreach (var l in logs.ToList())
+            {
+                if(l.Status == CommonEnums.LOGSTATUS.FEEDBACK_ACCEPT)
+                {
+                    fbAccept.Add(l);    
+                }
+            }
+
+            // Get logs with status Close
+            foreach (var l1 in logs.ToList())
+            {
+                if (l1.Status == CommonEnums.LOGSTATUS.FEEDBACK_CLOSE)
+                {
+                    fbClose.Add(l1);
+                }
+            }
+
+            // Remove logs with status Close which has identical Feedback Id
+            foreach (var l2 in fbAccept.ToList())
+            {
+                foreach (var l3 in fbClose.ToList())
+                {
+                    if(l2.FeedbackId == l3.FeedbackId)
+                    {
+                        fbAccept.Remove(l2);
+                    }
+                }
+            }
+
+            //if(fbAccept.Count == 0)
+            //{
+            //    throw new Exception("Fixer has no Accept feedbacks.");
+            //}
+
+            foreach (var log in fbAccept.ToList())
+            {
+                feedbacks.Add(log.Feedback);
+            }
+
+             IEnumerable<FeedbackResponse> results = feedbacks.Select(
+                feedback =>
+                {
+                    var u =  _userRepository.GetUserAndDeleteIsFalseNoTask(feedback.UserId ?? default(int));
+                    var r =  _roomRepository.GetRoomAndDeleteIsFalseNoTask(feedback.RoomId);
+                    var d =  _deviceRepository.GetDeviceAndDeleteIsFalseNoTask(feedback.DeviceId);
+                    string statuss = "ACCEPT";
+
+                    return new FeedbackResponse()
+                    {
+                        id = feedback.Id,
+                        userName = u.FullName,
+                        roomName = r.Name,
+                        deviceName = d.Name,
+                        description = feedback.Description,
+                        status = statuss
+                    };
+                }
+                )
+                .ToList();
+            return results;
+        }
+
+        public async Task<IEnumerable<FeedbackResponse>> GetFeedbacksByFixerIdAndStatusIsClose(int id)
+        {
+            // Get logs of fixer with status Accpet and Close 
+            var logs = await _logRepository.GetLogsByFixerId(id);
+            if (logs == null)
+            {
+                throw new Exception("Fixer has no feedback.");
+            }
+
+            List<Log> fbClose = new List<Log>();
+            List<Feedback> feedbacks = new List<Feedback>();
+
+            // Get logs with status Close
+            foreach (var l1 in logs.ToList())
+            {
+                if (l1.Status == CommonEnums.LOGSTATUS.FEEDBACK_CLOSE)
+                {
+                    fbClose.Add(l1);
+                }
+            }
+
+            //if(fbClose.Count == 0)
+            //{
+            //    throw new Exception("Fixer has no Close feedbacks.");
+            //}
+
+            foreach (var log in fbClose.ToList())
+            {
+                feedbacks.Add(log.Feedback);
+            }
+
+            IEnumerable<FeedbackResponse> results = feedbacks.Select(
+               feedback =>
+               {
+                   var u = _userRepository.GetUserAndDeleteIsFalseNoTask(feedback.UserId ?? default(int));
+                   var r = _roomRepository.GetRoomAndDeleteIsFalseNoTask(feedback.RoomId);
+                   var d = _deviceRepository.GetDeviceAndDeleteIsFalseNoTask(feedback.DeviceId);
+                   string statuss = "CLOSE";
+
+                   return new FeedbackResponse()
+                   {
+                       id = feedback.Id,
+                       userName = u.FullName,
+                       roomName = r.Name,
+                       deviceName = d.Name,
+                       description = feedback.Description,
+                       status = statuss
+                   };
+               }
+               )
+               .ToList();
+            return results;
+        }
+
         public async Task<IEnumerable<FeedbackResponse>> GetAllFeedbackOnPending()
         {
             var feedbacks = await _feedbackRepository.GetList();
@@ -310,6 +442,11 @@ namespace DataAccess.Services
                 throw new Exception("Department busy!");
             }
 
+            //update device status
+            var device = await _deviceRepository.GetDeviceAndDeleteIsFalse(fb.DeviceId);
+            device.Status = CommonEnums.DEVICESTATUS.ACTIVE;
+            
+
             Log newLog = new()
             {
                 FeedbackId = fb.Id,
@@ -322,10 +459,11 @@ namespace DataAccess.Services
                 CreatedBy = "system",
             };
 
-            fb.Status = CommonEnums.FEEDBACKSTATUS.DONE;
+            fb.Status = CommonEnums.FEEDBACKSTATUS.CLOSE;
             fb.UpdatedAt = DateTime.Now;
             fb.UpdatedBy = "Fixer";
 
+            await _deviceRepository.UpdateDevice(device);
             await _feedbackRepository.Update(fb);
             await _logRepository.Create(newLog);
         }

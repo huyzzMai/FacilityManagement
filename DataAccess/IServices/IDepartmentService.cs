@@ -15,7 +15,7 @@ namespace DataAccess.IServices
         Task<Department> GetDepartmentById(int id);
         Task<Department> GetDepartmentByName(string name);
         Task<DepartmentResponse> CreateDepartment(DepartmentRequest request);
-        Task<DepartmentResponse> UpdateDepartment(int id, DepartmentRequest request);
+        Task UpdateDepartment(int id, DepartmentRequest request);
         Task AddBusyStatus(int id);
         Task RemoveBusyStatus(int id);
         Task DeleteDepartment(int id);

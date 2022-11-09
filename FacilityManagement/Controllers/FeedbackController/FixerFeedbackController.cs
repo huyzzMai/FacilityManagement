@@ -3,30 +3,59 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FacilityManagement.Controllers.FeedbackController
 {
     [Route("api/fixerfeedback")]
     [ApiController]
-    //[Authorize(Roles = "Fixer")]
+    [Authorize(Roles = "Fixer")]
     public class FixerFeedbackController : ControllerBase
     {
         private readonly IFeedbackService feedbackService;
 
-        public FixerFeedbackController(IFeedbackService feedbackService)
+        private readonly IUserService userService;
+
+        public FixerFeedbackController(IFeedbackService feedbackService, IUserService userService)
         {
             this.feedbackService = feedbackService; 
+            this.userService = userService;
         }
 
-        [HttpGet("user/{userId:int}")]
-        public async Task<IActionResult> GetFeedbackListByFixerId(int userId)
+        [HttpGet("accept-feedback")]
+        public async Task<IActionResult> GetAcceptFeedbackListByFixerId()
         {
             try
             {
-                return Ok(await feedbackService.GetAllFeedbackByUserId(userId));
+                // Get id of current log in user 
+                int userId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
+
+                var s = await feedbackService.GetFeedbacksByFixerIdAndStatusIsAccept(userId);
+
+                return Ok(s);
             }
             catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ex.Message);
+            }
+        }
+
+        [HttpGet("close-feedback")]
+        public async Task<IActionResult> GetCLoseFeedbackListByFixerId()
+        {
+            try
+            {
+                // Get id of current log in user 
+                int userId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
+
+                var s = await feedbackService.GetFeedbacksByFixerIdAndStatusIsClose(userId);
+
+                return Ok(s);
+            }
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ex.Message);
@@ -47,11 +76,14 @@ namespace FacilityManagement.Controllers.FeedbackController
             }
         }
 
-        [HttpPut("feedback/{feedbackId:int}/fixer/{fixerId:int}")]
-        public async Task<IActionResult> ProcessFeedback(int fixerId, int feedbackId, string message)
+        [HttpPut("feedback/{feedbackId:int}")]
+        public async Task<IActionResult> ProcessFeedback(int feedbackId, string message)
         {
             try
             {
+                // Get id of current log in user 
+                int fixerId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
+
                 await feedbackService.ProcessFeedback(fixerId, feedbackId, message);
                 return Ok("Process completed successfully");
             }

@@ -29,6 +29,13 @@ namespace FacilityManagement.Controllers.LogsController
             return await _service.GetAllLog();
         }
 
+        // GET: api/Logs/Statistic
+        [HttpGet("Statistic")]
+        public async Task<LogStatisticResponse> GetStatistic()
+        {
+            return await _service.GetLogStatisticCurrentMonth();
+        }
+
         // GET: api/Logs/5
         [HttpGet("{id}")]
         public async Task<ActionResult<LogResponse>> GetLog(int id)
