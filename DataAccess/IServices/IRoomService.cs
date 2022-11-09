@@ -14,7 +14,10 @@ namespace DataAccess.IServices
         Task<IEnumerable<RoomResponse>> GetAllRoom();
         Task<Room> GetRoomById(int id);
         Task<Room> GetRoomByName(string name);
-        Task<RoomResponse> UpdateRoom(int id, RoomRequest rooms);
+        //Task<RoomResponse> UpdateRoom(int id, RoomRequest rooms);
+        Task UpdateRoom(int id, RoomRequest rooms);
+        Task UpdateRoomStatusInActive(int id);
+        Task RemoveRoomStatusInActive(int id);
         Task<RoomResponse> CreateRoom(RoomRequest rooms);
         Task DeleteRoom(int id);
     }

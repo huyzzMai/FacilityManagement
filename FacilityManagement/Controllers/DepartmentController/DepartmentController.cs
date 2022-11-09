@@ -21,7 +21,7 @@ namespace FacilityManagement.Controllers.DepartmentController
         {
             this.departmentService = departmentService;
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> GetAllDepartment()
         {
@@ -35,7 +35,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-
+      
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetDepartmentById(int id){
             try
@@ -73,7 +73,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-
+    
         [HttpPost]
         public async Task<IActionResult> CreateDepartment([FromBody] DepartmentRequest model)
         {
@@ -98,7 +98,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-
+       
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateDepartment(int id, [FromBody] DepartmentRequest model)
         {
@@ -130,7 +130,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-
+        
         [HttpPut("status/busy/{id:int}")]
         public async Task<IActionResult> UpdateBusyDepartmentStatus(int id)
         {
@@ -145,7 +145,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-
+        
         [HttpPut("status/remove-busy/{id:int}")]
         public async Task<IActionResult> RemoveBusyDepartmentStatus(int id)
         {
@@ -160,7 +160,7 @@ namespace FacilityManagement.Controllers.DepartmentController
                     ex.Message);
             }
         }
-
+       
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {

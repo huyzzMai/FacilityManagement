@@ -11,7 +11,7 @@ using BusinessObject.ResponseModel.LogResponse;
 
 namespace FacilityManagement.Controllers.LogsController
 {
-    [Route("api/[controller]")]
+    [Route("api/logs")]
     [ApiController]
     public class LogsController : ControllerBase
     {
