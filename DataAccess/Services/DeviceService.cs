@@ -54,6 +54,15 @@ namespace DataAccess.Services
             IEnumerable<DeviceResponse> result = devices.Select(
                 device =>
                 {
+                    //string status = null;
+                    //if (device.Status == CommonEnums.DEVICESTATUS.ACTIVE)
+                    //{
+                    //    status = "ACTIVE";
+                    //}
+                    //else if (device.Status == CommonEnums.DEVICESTATUS.INACTIVE)
+                    //{
+                    //    status = "INACTIVE";
+                    //}
                     return new DeviceResponse()
                     {
                         DeviceTypeID = device.DeviceTypeId,
