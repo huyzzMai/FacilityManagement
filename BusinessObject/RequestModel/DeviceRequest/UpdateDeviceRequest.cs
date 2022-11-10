@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObject.RequestModel.RoomRequest
+namespace BusinessObject.RequestModel.DeviceRequest
 {
-    public class RoomRequest
+    public class UpdateDeviceRequest
     {
         public string Name { get; set; }
-        public string Level { get; set; }
-        //public int Status { get; set; }
     }
 }

@@ -59,12 +59,12 @@ namespace FacilityManagement.Controllers.DeviceController
                 }
 
                 var device = new DeviceResponse()
-                {
+                {   
+                    id = d.Id,
                     DeviceTypeID = d.DeviceTypeId,
                     RoomID = d.RoomId,
                     Name = d.Name,
-                    //Status = status
-                    Status = d.Status
+                    Status = status
                 };
 
                 return Ok(device);
@@ -88,9 +88,8 @@ namespace FacilityManagement.Controllers.DeviceController
 
                 if (r == null)
                 {
-                    
-                    return StatusCode(StatusCodes.Status201Created,
-                    await deviceService.CreateDevice(devices)); 
+                    await deviceService.CreateDevice(devices);
+                    return StatusCode(StatusCodes.Status201Created,"Create successfully!"); 
                 }
                 else
                 {
@@ -107,7 +106,7 @@ namespace FacilityManagement.Controllers.DeviceController
         }
         [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateDevice(int id, [FromBody] DeviceRequest devices)
+        public async Task<IActionResult> UpdateDevice(int id, [FromBody] UpdateDeviceRequest devices)
         {
             try
             {
