@@ -7,12 +7,13 @@ using BusinessObject.RequestModel.DeviceTypeRequest;
 using DataAccess.Services;
 using BusinessObject.Commons;
 using BusinessObject.ResponseModel.DeviceTypeResponse;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FacilityManagement.Controllers.DeviceType
 {
     [Route("api/device-type")]
     [ApiController]
-    //[Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "Admin, User")]
     public class DeviceTypeController : ControllerBase
     {
         private readonly IDeviceTypeService deviceTypeService;
@@ -63,7 +64,7 @@ namespace FacilityManagement.Controllers.DeviceType
             }
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateDeviceType([FromBody] DeviceTypeRequest devices)
         {
@@ -91,7 +92,7 @@ namespace FacilityManagement.Controllers.DeviceType
                      "Error creating user!");
             }
         }
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateDeviceType(int id, [FromBody] DeviceTypeRequest devices)
         {
@@ -117,7 +118,7 @@ namespace FacilityManagement.Controllers.DeviceType
                     ex.Message);
             }
         }
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteDeviceType(int id)
         {

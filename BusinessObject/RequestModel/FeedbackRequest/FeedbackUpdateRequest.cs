@@ -10,7 +10,6 @@ namespace BusinessObject.RequestModel.FeedbackRequest
     public class FeedbackUpdateRequest
     {
         public int? deviceId;
-        public int? roomId;
         public byte[] image;
         public string description;
         public bool? flag;

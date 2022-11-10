@@ -33,10 +33,14 @@ namespace DataAccess.Services
             try
             {
                 Feedback feedback = await _feedbackRepository.GetFeedback(id);
+                Device device = await _deviceRepository.GetDeviceAndDeleteIsFalse(feedbackRequest.deviceId.GetValueOrDefault());
 
-                feedback.RoomId = feedbackRequest.roomId ??= feedback.RoomId;
                 feedback.Flag = feedbackRequest.flag ??= feedback.Flag;
-                feedback.DeviceId = feedbackRequest.deviceId ??= feedback.DeviceId;
+                if(feedback.DeviceId != feedbackRequest.deviceId)
+                {
+                    feedback.RoomId = device.RoomId.GetValueOrDefault();
+                    feedback.DeviceId = feedbackRequest.deviceId.GetValueOrDefault();
+                }
                 feedback.Description = feedbackRequest.description ??= feedback.Description;
                 feedback.Image = feedbackRequest.image ??= feedback.Image;
                 feedback.Status = feedbackRequest.status ??= feedback.Status;

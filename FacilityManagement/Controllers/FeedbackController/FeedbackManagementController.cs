@@ -13,7 +13,7 @@ namespace FacilityManagement.Controllers.FeedbackController
 {
     [Route("api/feedback-management")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class FeedbackManagementController : ControllerBase
     {
         private readonly IFeedbackService _service;
@@ -30,6 +30,14 @@ namespace FacilityManagement.Controllers.FeedbackController
         public async Task<IEnumerable<FeedbackResponse>> GetFeedbacks()
         {
             IEnumerable<FeedbackResponse> feedbacks = await _service.GetAllFeedback();
+
+            return feedbacks;
+        }
+
+        [HttpGet("user/{id}")]
+        public async Task<IEnumerable<FeedbackResponse>> GetFeedbacksByUserId(int id)
+        {
+            var feedbacks = await _service.GetAllFeedbackByUserId(id);
 
             return feedbacks;
         }

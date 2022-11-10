@@ -35,6 +35,7 @@ namespace BusinessObject.Models
             {
                 id = feedback.Id,
                 userName = feedback.User.FullName,
+                email = feedback.User.Email,
                 roomName = feedback.Room.Name,
                 deviceName = feedback.Device.Name,
                 description = feedback.Description,
