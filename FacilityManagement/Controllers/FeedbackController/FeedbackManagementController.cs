@@ -13,7 +13,7 @@ namespace FacilityManagement.Controllers.FeedbackController
 {
     [Route("api/feedback-management")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class FeedbackManagementController : ControllerBase
     {
         private readonly IFeedbackService _service;

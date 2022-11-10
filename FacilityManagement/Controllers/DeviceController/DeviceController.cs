@@ -13,7 +13,7 @@ namespace FacilityManagement.Controllers.DeviceController
 {
     [Route("api/device")]
     [ApiController]
-    [Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "Admin, User, Fixer")]
     public class DeviceController : ControllerBase
     {
         private readonly IDeviceService deviceService;
@@ -63,6 +63,7 @@ namespace FacilityManagement.Controllers.DeviceController
                     DeviceTypeID = d.DeviceTypeId,
                     RoomID = d.RoomId,
                     Name = d.Name,
+                    //Status = status
                     Status = d.Status
                 };
 
