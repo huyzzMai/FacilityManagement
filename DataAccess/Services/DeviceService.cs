@@ -15,12 +15,16 @@ namespace DataAccess.Services
     public class DeviceService : IDeviceService
     {
         private readonly IDeviceRepository deviceRepository;
+        private readonly IRoomRepository roomRepository;
+        private readonly IDeviceTypeRepository deviceTypeRepository;
 
         public IConfiguration _configuration;
-        public DeviceService(IDeviceRepository deviceRepository, IConfiguration configuration)
+        public DeviceService(IDeviceRepository deviceRepository, IConfiguration configuration, IRoomRepository roomRepository, IDeviceTypeRepository deviceTypeRepository)
         {
             _configuration = configuration;
             this.deviceRepository = deviceRepository;
+            this.roomRepository = roomRepository;
+            this.deviceTypeRepository = deviceTypeRepository;
         }
         public async Task<Device> GetDeviceByName(string name)
         {
@@ -126,11 +130,23 @@ namespace DataAccess.Services
         public async Task CreateDevice(DeviceRequest devices)
         {
             var r = await deviceRepository.GetDeviceByName(devices.Name);
-            var h = await deviceRepository.GetDeviceByRoomID(devices.RoomID);
-            var g = await deviceRepository.GetDeviceByDeviceTypeID(devices.DeviceTypeID);
+            var h = await roomRepository.GetRoomAndDeleteIsFalse(devices.RoomID);
+            var g = await deviceTypeRepository.GetDeviceTypeAndDeleteIsFalse(devices.DeviceTypeID);
 
-            if (r == null && h != null && g != null)
+            if(r != null)
             {
+                throw new Exception("Name existed!");
+            }
+            if(h == null)
+            {
+                throw new Exception("Room not existed!");
+            }
+            if (g == null)
+            {
+                throw new Exception("Device Type not existed!");
+            }
+            //if (r == null && h != null && g != null)
+            //{
                 Device rms = new Device();
                 rms.DeviceTypeId = devices.DeviceTypeID;
                 rms.RoomId = devices.RoomID;
@@ -149,11 +165,11 @@ namespace DataAccess.Services
                 //    Status = rms.Status
                 //};
                 //return updevice;
-            }
-            else
-            {
-                throw new Exception("This Device already exist or roomID, DeviceTypeID are not found, please try again!");
-            }
+            //}
+            //else
+            //{
+            //    throw new Exception("This Device already exist or roomID, DeviceTypeID are not found, please try again!");
+            //}
 
         }
 

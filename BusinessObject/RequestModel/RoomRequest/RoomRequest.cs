@@ -10,6 +10,6 @@ namespace BusinessObject.RequestModel.RoomRequest
     {
         public string Name { get; set; }
         public string Level { get; set; }
-        public int Status { get; set; }
+        //public int Status { get; set; }
     }
 }
