@@ -29,10 +29,13 @@ namespace FacilityManagement.Controllers.FeedbackController
         }
 
         // GET: api/Feedback/Feedbacks/5
-        [HttpGet("user/{id}")]
-        public async Task<IEnumerable<FeedbackResponse>> GetFeedbacksByUserId(int id)
+        [HttpGet]
+        public async Task<IEnumerable<FeedbackResponse>> GetFeedbacksByUserId()
         {
-            var feedbacks = await _service.GetAllFeedbackByUserId(id);
+            // Get id of current log in user 
+            int userId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
+
+            var feedbacks = await _service.GetAllFeedbackByUserId(userId);
 
             return feedbacks;
         }

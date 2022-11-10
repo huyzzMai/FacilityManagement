@@ -14,7 +14,7 @@ namespace FacilityManagement.Controllers.RoomController
 {
     [Route("api/room")]
     [ApiController]
-    //[Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "Admin, User")]
     public class RoomController : ControllerBase
     {
         private readonly IRoomService roomService;
@@ -75,7 +75,7 @@ namespace FacilityManagement.Controllers.RoomController
                     ex.Message);
             }
         }
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] RoomRequest rooms)
         {
@@ -104,7 +104,7 @@ namespace FacilityManagement.Controllers.RoomController
             }
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateRoom(int id,[FromBody] RoomRequest rooms)
         {
@@ -131,7 +131,7 @@ namespace FacilityManagement.Controllers.RoomController
             }
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("status-inactive/{id:int}")]
         public async Task<IActionResult> UpdateRoomStatus(int id)
         {
@@ -158,7 +158,7 @@ namespace FacilityManagement.Controllers.RoomController
             }
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("status-active/{id:int}")]
         public async Task<IActionResult> RemoveRoomStatusInActive(int id)
         {
@@ -185,7 +185,7 @@ namespace FacilityManagement.Controllers.RoomController
             }
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteRoom(int id)
         {

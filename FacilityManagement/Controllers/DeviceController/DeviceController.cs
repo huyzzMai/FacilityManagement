@@ -7,12 +7,13 @@ using System;
 using DataAccess.Services;
 using BusinessObject.Commons;
 using BusinessObject.ResponseModel.DeviceResponse;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FacilityManagement.Controllers.DeviceController
 {
     [Route("api/device")]
     [ApiController]
-    //[Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "Admin, User")]
     public class DeviceController : ControllerBase
     {
         private readonly IDeviceService deviceService;
@@ -75,7 +76,7 @@ namespace FacilityManagement.Controllers.DeviceController
             }
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateDevice([FromBody] DeviceRequest devices)
         {
@@ -103,7 +104,7 @@ namespace FacilityManagement.Controllers.DeviceController
                     ex.Message);
             }
         }
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateDevice(int id, [FromBody] DeviceRequest devices)
         {
@@ -129,7 +130,7 @@ namespace FacilityManagement.Controllers.DeviceController
                     ex.Message);
             }
         }
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteDevice(int id)
         {

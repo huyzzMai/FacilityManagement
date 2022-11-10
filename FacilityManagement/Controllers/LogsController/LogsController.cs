@@ -8,11 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using BusinessObject.Models;
 using DataAccess.IServices;
 using BusinessObject.ResponseModel.LogResponse;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FacilityManagement.Controllers.LogsController
 {
     [Route("api/logs")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class LogsController : ControllerBase
     {
         private readonly ILogService _service;
