@@ -14,7 +14,7 @@ namespace FacilityManagement.Controllers.RoomController
 {
     [Route("api/room")]
     [ApiController]
-    [Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "Admin, User, Fixer")]
     public class RoomController : ControllerBase
     {
         private readonly IRoomService roomService;

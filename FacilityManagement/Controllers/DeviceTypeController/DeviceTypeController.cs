@@ -13,7 +13,7 @@ namespace FacilityManagement.Controllers.DeviceType
 {
     [Route("api/device-type")]
     [ApiController]
-    [Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "Admin, User, Fixer")]
     public class DeviceTypeController : ControllerBase
     {
         private readonly IDeviceTypeService deviceTypeService;
