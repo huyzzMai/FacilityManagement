@@ -39,7 +39,7 @@ namespace DataAccess.Repositories
         }
         public async Task<Device> GetDeviceAndDeleteIsFalse(int id)
         {
-            Device rm = await dbContext.Devices.Where(r => r.Id.Equals(id) && r.IsDeleted == false)      
+            Device rm = await dbContext.Devices.Include("Room").Where(r => r.Id.Equals(id) && r.IsDeleted == false)      
                 .FirstOrDefaultAsync();
             return rm;
         }
