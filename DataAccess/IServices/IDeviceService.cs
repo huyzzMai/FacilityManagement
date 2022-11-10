@@ -13,8 +13,10 @@ namespace DataAccess.IServices
         //Task<Device> GetDeviceByRoomID(int id);
         //Task<Device> GetDeviceByDeviceTypeID(int id);
         Task<Device> GetDeviceByName(string name);
-        Task<DeviceResponse> UpdateDevice(int id, DeviceRequest devices);
-        Task<DeviceResponse> CreateDevice(DeviceRequest devices);
+        //Task<DeviceResponse> UpdateDevice(int id, DeviceRequest devices);
+        Task UpdateDevice(int id, UpdateDeviceRequest devices);
+        //Task<DeviceResponse> CreateDevice(DeviceRequest devices);
+        Task CreateDevice(DeviceRequest devices);
         Task DeleteDevice(int id);
     }
 }
