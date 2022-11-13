@@ -124,7 +124,7 @@ namespace DataAccess.Services
             if (r == null)
             {
                 DeviceType rms = new DeviceType();
-                rms.DepartmentId= CommonEnums.DEPARTMENTID.FACILITYDEPARTMENT;
+                rms.DepartmentId= devices.DepartmentId;
                 rms.Name = devices.Name;
                 //rms.Status = CommonEnums.;
                 rms.IsDeleted = false;

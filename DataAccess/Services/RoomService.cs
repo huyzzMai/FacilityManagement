@@ -58,7 +58,8 @@ namespace DataAccess.Services
                     }
 
                     return new RoomResponse()
-                    {
+                    {   
+                        id = room.Id,
                         Name = room.Name,
                         Level = room.Level,
                         Status = status
