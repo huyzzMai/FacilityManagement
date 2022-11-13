@@ -135,15 +135,15 @@ namespace DataAccess.Services
 
             if(r != null)
             {
-                throw new Exception("Name existed!");
+                throw new Exception("Name existed, please try again!");
             }
             if(h == null)
             {
-                throw new Exception("Room not existed!");
+                throw new Exception("Room not existed, please try again!");
             }
             if (g == null)
             {
-                throw new Exception("Device Type not existed!");
+                throw new Exception("Device Type not existed, please try again!");
             }
             //if (r == null && h != null && g != null)
             //{
