@@ -114,7 +114,7 @@ namespace DataAccess.Services
 
             string decryptOldPass = DecryptPassword(user.Password);
 
-            if(decryptOldPass != oldPass)
+            if(oldPass != decryptOldPass)
             {
                 throw new Exception("Old password wrong!");
             }

@@ -74,13 +74,13 @@ namespace FacilityManagement.Controllers.UserController
         }
 
         [HttpPut("password")]
-        public async Task<IActionResult> UpdatePassword(string oldPass, string newPass)
+        public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordRequest request)
         {
             try
             {
                 // Get id of current log in user 
                 int userId = userService.GetCurrentLoginUserId(Request.Headers["Authorization"]);
-                await userService.UpdatePassword(userId, oldPass, newPass);
+                await userService.UpdatePassword(userId, request.oldPassword, request.newPassword);
                 return Ok("Password updated successfully");
             }
             catch(Exception ex)

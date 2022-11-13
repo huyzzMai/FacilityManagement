@@ -11,6 +11,7 @@ namespace BusinessObject.ResponseModel.FeedbackResponse
         public int id { get; set; }
         public string userName { get; set; }
         public string email { get; set; }
+        public byte [] image { get; set; }
         public string roomName { get; set; }
         public string deviceName { get; set; }
         public string description { get; set; }
