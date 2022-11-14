@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using BusinessObject.Commons;
@@ -45,10 +46,10 @@ namespace DataAccess.Services
                 feedback.Image = feedbackRequest.image ??= feedback.Image;
                 feedback.Status = feedbackRequest.status ??= feedback.Status;
 
-                if (feedback.Equals(await _feedbackRepository.GetFeedback(id)))
-                {
+                //if (feedback.Equals(await _feedbackRepository.GetFeedback(id)))
+                //{
                     //update if changed
-                    feedback.UpdatedAt = DateTime.Today;
+                    feedback.UpdatedAt = DateTime.Now;
                     feedback.UpdatedBy = "system";
 
                     await _feedbackRepository.Update(feedback);
@@ -66,8 +67,8 @@ namespace DataAccess.Services
                         CreatedBy = "system",
                     };
                     await _logRepository.Create(log);
-                }
-
+                //}
+                Debug.WriteLine(feedback.DeviceId.ToString());
             }
             catch (Exception ex)
             {
@@ -374,8 +375,10 @@ namespace DataAccess.Services
                     {
                         id = feedback.Id,
                         userName = u.FullName,
+                        email = u.Email,
                         roomName = r.Name,
                         deviceName = d.Name,
+                        image = feedback.Image,
                         description = feedback.Description,
                         status = statuss
                     };
@@ -428,8 +431,10 @@ namespace DataAccess.Services
                    {
                        id = feedback.Id,
                        userName = u.FullName,
+                       email = u.Email,
                        roomName = r.Name,
                        deviceName = d.Name,
+                       image = feedback.Image,
                        description = feedback.Description,
                        status = statuss
                    };
